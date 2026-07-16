@@ -1,6 +1,15 @@
 # 🌌 AuraTranslate | 极光翻译与智能英语备考系统
 
+[![GitHub Pages](https://img.shields.io/badge/🌐%20Live%20Demo-GitHub%20Pages-blue?style=for-the-badge)](https://khssdsg-maker.github.io/aura-translate/)
+[![GitHub Repo](https://img.shields.io/badge/📦%20Source-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/khssdsg-maker/aura-translate)
+
 AuraTranslate 是一款将**高颜值毛玻璃（Glassmorphism）视觉设计**与**智能英语备考学习**融为一体的单页 Web 应用。它不仅提供流畅的实时翻译功能，还内置了口语跟读评测、3D 单词卡片、以及大学英语四六级（CET-4/CET-6）30天备考计划与真题模拟训练系统。
+
+## 🚀 在线体验
+
+**🌐 Live Demo：[https://khssdsg-maker.github.io/aura-translate/](https://khssdsg-maker.github.io/aura-translate/)**
+
+> 无需安装任何依赖，点击即用。推荐使用 Chrome 或 Edge 浏览器以体验完整的语音功能。
 
 ---
 
