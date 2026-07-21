@@ -5,6 +5,12 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Global runtime error monitor
+  window.onerror = function(message, source, lineno, colno, error) {
+    console.error("Runtime error caught:", message, "at line:", lineno);
+    showToast("运行时错误: " + message + " (行 " + lineno + ")", "error");
+  };
+
   // --- DOM Elements ---
   const htmlEl = document.documentElement;
   const themeToggleBtn = document.getElementById('theme-toggle');
@@ -197,6 +203,16 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     readerSelectedText: ""
   };
+
+  // Defensive array checks to prevent type errors on null localStorage items
+  if (!Array.isArray(state.history)) state.history = [];
+  if (!Array.isArray(state.favorites)) state.favorites = [];
+  if (!Array.isArray(state.vocabulary)) state.vocabulary = [];
+  if (!Array.isArray(state.wrongQuestions)) state.wrongQuestions = [];
+  if (!state.stats) state.stats = { transDates: {}, oralScores: [], quizCount: 0 };
+  if (!state.stats.transDates) state.stats.transDates = {};
+  if (!state.stats.oralScores) state.stats.oralScores = [];
+  state.stats.quizCount = state.stats.quizCount || 0;
 
   // --- Speech Setup ---
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
