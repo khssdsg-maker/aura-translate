@@ -1,3 +1,7 @@
 {
+  "anthropicUrl": "https://api.longcat.chat/anthropic",
+  "apiKey": "ak_2mh7Na1ZX3rp1vQ9F09Iq1js1x58C",
+  "baseUrl": "https://api.longcat.chat/openai",
+  "modelId": "LongCat-2.0",
   "models": []
 }

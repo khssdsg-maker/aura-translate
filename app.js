@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const DEBOUNCE_DELAY = 800; // ms
   let debounceTimeout = null;
   const apiCache = {};
+  let translateAbortController = null;
   
   // App state
   const state = {
@@ -492,7 +493,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnCardSpeakSrc.addEventListener('click', (e) => {
       e.stopPropagation();
-      speak(cardFrontWord.textContent, 'en');
+      const activeWord = state.vocabulary[state.activeCardIndex];
+      if (activeWord && activeWord.audio) {
+        const player = new Audio(activeWord.audio);
+        player.play().catch(() => {
+          speak(activeWord.word, 'en');
+        });
+      } else {
+        speak(cardFrontWord.textContent, 'en');
+      }
     });
 
     btnPrevCard.addEventListener('click', () => navigateFlashcard(-1));
@@ -745,6 +754,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Text to Speech (TTS) ---
   function speak(text, langCode) {
     if (!text) return;
+    
+    // Stop microphone recordings to avoid self-loop feedback
+    if (state.isRecording) {
+      stopSpeechRecognition();
+    }
+    if (practiceRecognition && btnPracticeMic.classList.contains('recording')) {
+      practiceRecognition.stop();
+      btnPracticeMic.classList.remove('recording');
+    }
+    
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
@@ -764,6 +783,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Speech Recognition ---
   function toggleSpeechRecognition() {
     if (!recognition) return;
+    
+    // Stop practice recording if it is running
+    if (practiceRecognition && btnPracticeMic.classList.contains('recording')) {
+      practiceRecognition.stop();
+      btnPracticeMic.classList.remove('recording');
+    }
+    
+    // Stop any active text-to-speech to prevent capturing it
+    window.speechSynthesis.cancel();
     
     if (state.isRecording) {
       stopSpeechRecognition();
@@ -1168,6 +1196,40 @@ document.addEventListener('DOMContentLoaded', () => {
       timestamp: Date.now()
     };
     
+    // Asynchronously fetch phonetic and audio from DictionaryAPI
+    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(trimmedWord)}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Phonetics API returned error status.');
+        return res.json();
+      })
+      .then(data => {
+        if (data && data[0]) {
+          const entry = data[0];
+          let ipa = entry.phonetic;
+          if (!ipa && entry.phonetics && entry.phonetics.length > 0) {
+            const withText = entry.phonetics.find(p => p.text);
+            if (withText) ipa = withText.text;
+          }
+          if (ipa) {
+            item.pron = ipa;
+          }
+          let audioUrl = "";
+          const withAudio = entry.phonetics.find(p => p.audio && p.audio.trim());
+          if (withAudio) audioUrl = withAudio.audio;
+          if (audioUrl) {
+            item.audio = audioUrl;
+          }
+          
+          const idx = state.vocabulary.findIndex(v => v.id === item.id);
+          if (idx > -1) {
+            state.vocabulary[idx] = item;
+            localStorage.setItem('aura_vocabulary', JSON.stringify(state.vocabulary));
+            renderVocabList();
+          }
+        }
+      })
+      .catch(err => console.log('Pronunciation API fetch failed, fallback active:', err));
+      
     state.vocabulary.unshift(item);
     localStorage.setItem('aura_vocabulary', JSON.stringify(state.vocabulary));
     
@@ -1395,6 +1457,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function togglePracticeRecording() {
     if (!practiceRecognition) return;
     
+    // Stop main translator voice recording if active
+    if (state.isRecording) {
+      stopSpeechRecognition();
+    }
+    
+    // Stop active TTS
+    window.speechSynthesis.cancel();
+    
     // If already running
     if (btnPracticeMic.classList.contains('recording')) {
       practiceRecognition.stop();
@@ -1409,20 +1479,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function getLevenshteinDistance(a, b) {
+    const tmp = [];
+    for (let i = 0; i <= a.length; i++) {
+      tmp[i] = [i];
+    }
+    for (let j = 0; j <= b.length; j++) {
+      tmp[0][j] = j;
+    }
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        tmp[i][j] = Math.min(
+          tmp[i - 1][j] + 1, // deletion
+          tmp[i][j - 1] + 1, // insertion
+          tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1) // substitution
+        );
+      }
+    }
+    return tmp[a.length][b.length];
+  }
+
   function evaluatePronunciation(spokenText) {
-    // Word/phrase match assessment (fuzzy string intersection match scoring)
-    const cleanTarget = targetPracticeText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").split(/\s+/).filter(Boolean);
-    const cleanSpoken = spokenText.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").split(/\s+/).filter(Boolean);
+    const cleanPunctuation = (str) => {
+      return str.toLowerCase()
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    };
     
-    let matches = 0;
-    cleanTarget.forEach(word => {
-      if (cleanSpoken.includes(word)) {
-        matches++;
+    const targetCleaned = cleanPunctuation(targetPracticeText);
+    const spokenCleaned = cleanPunctuation(spokenText);
+    
+    if (!targetCleaned || !spokenCleaned) {
+      practiceScoreRing.setAttribute('stroke-dasharray', '0, 100');
+      practiceScoreText.textContent = '0%';
+      practiceFeedbackText.textContent = "未能识别到发音，请重新尝试";
+      practiceStatusText.innerHTML = `听到您说的是: <span style="color: var(--accent-primary);">"${spokenText || '...'}"</span>`;
+      practiceResultPanel.classList.remove('hidden');
+      return;
+    }
+    
+    // Levenshtein Similarity (character level)
+    const maxLen = Math.max(targetCleaned.length, spokenCleaned.length);
+    const distance = getLevenshteinDistance(targetCleaned, spokenCleaned);
+    const charScore = Math.round((1 - distance / maxLen) * 100);
+    
+    // Word match ratio
+    const targetWords = targetCleaned.split(' ');
+    const spokenWords = spokenCleaned.split(' ');
+    let wordMatches = 0;
+    targetWords.forEach(word => {
+      if (spokenWords.includes(word)) {
+        wordMatches++;
       }
     });
+    const wordScore = Math.round((wordMatches / targetWords.length) * 100);
     
-    const accuracy = Math.round((matches / Math.max(cleanTarget.length, 1)) * 100);
-    const score = Math.min(accuracy, 100);
+    // Hybrid scoring formula
+    const score = Math.max(0, Math.min(100, Math.round(charScore * 0.4 + wordScore * 0.6)));
     
     // Animate Chart SVG ring
     practiceScoreRing.setAttribute('stroke-dasharray', `${score}, 100`);
@@ -1430,18 +1544,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Construct feedback message
     let feedback = "";
-    if (score >= 90) {
-      feedback = "完美！发音非常地道！";
-    } else if (score >= 70) {
-      feedback = "很好！发音清晰，继续练习！";
+    if (score >= 85) {
+      feedback = "完美！发音非常清晰地道！";
+    } else if (score >= 65) {
+      feedback = "很好！发音较标准，继续保持！";
     } else if (score >= 40) {
-      feedback = "加油！个别单词发音可以更饱满一些。";
+      feedback = "不错，部分单词可以发音更圆润一些。";
     } else {
-      feedback = "没关系，再听一遍录音，大声读出来吧！";
+      feedback = "加油！请再听一遍录音并大声模仿。";
     }
     
     practiceFeedbackText.textContent = feedback;
-    practiceStatusText.innerHTML = `听到您说的是: <span style="font-weight: 700; color: var(--accent-primary);">"${spokenText}"</span>`;
+    practiceStatusText.innerHTML = `听到您说的是: <span style="font-weight: 700; color: var(--accent-primary);">${spokenText}</span>`;
     practiceResultPanel.classList.remove('hidden');
   }
 
@@ -1604,6 +1718,16 @@ document.addEventListener('DOMContentLoaded', () => {
       quizResultBadge.textContent = '正确';
       quizResultBadge.className = 'status-badge correct-badge';
       showToast('回答正确！太棒了', 'success');
+      
+      // If this was a retry from wrong questions book, prompt to remove it
+      const inWrongBook = state.wrongQuestions.some(q => q.id === questionData.id);
+      if (inWrongBook) {
+        setTimeout(() => {
+          if (confirm('恭喜您答对了！是否将这道题从错题本中移除？')) {
+            deleteWrongQuestion(questionData.id);
+          }
+        }, 800);
+      }
     } else {
       selectedBtn.classList.add('incorrect');
       quizResultBadge.textContent = '错误';
