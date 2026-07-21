@@ -100,8 +100,20 @@
         <!-- Text Areas Grid -->
         <div class="text-areas-container">
           <!-- Source Input Box -->
-          <div class="text-box-wrapper source-wrapper">
-            <textarea id="src-text" placeholder="输入要翻译的文本..." maxlength="3000" aria-label="Source Text"></textarea>
+          <div class="text-box-wrapper source-wrapper" id="source-wrapper">
+            <!-- OCR Drag and drop Overlay -->
+            <div id="ocr-drag-overlay" class="ocr-drag-overlay hidden">
+              <div class="ocr-overlay-content">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p>释放图片，立即提取英文并翻译</p>
+              </div>
+            </div>
+            <!-- OCR Parser loader -->
+            <div id="ocr-loader" class="ocr-loader-overlay hidden">
+              <div class="spinner"></div>
+              <p>正在分析并提取图片文本...</p>
+            </div>
+            <textarea id="src-text" placeholder="输入文本，或拖入图片、粘贴截图翻译..." maxlength="3000" aria-label="Source Text"></textarea>
             <div class="text-box-footer">
               <div class="box-actions">
                 <button id="btn-speak-src" class="action-btn" title="朗读源文本" aria-label="Speak Source Text">
@@ -109,6 +121,9 @@
                 </button>
                 <button id="btn-mic-src" class="action-btn mic-btn" title="语音输入" aria-label="Voice Input">
                   <i class="fa-solid fa-microphone"></i>
+                </button>
+                <button id="btn-ocr-hint" class="action-btn" title="已启用OCR：支持拖入图片文件或截图Ctrl+V粘贴解析" aria-label="OCR Active">
+                  <i class="fa-solid fa-file-image"></i>
                 </button>
                 <button id="btn-clear" class="action-btn" title="清空文本" aria-label="Clear Text">
                   <i class="fa-solid fa-trash-can"></i>
@@ -202,11 +217,17 @@
               <button id="subtab-vocab" class="subtab-btn active" data-subtab="vocab">
                 <i class="fa-solid fa-book"></i> 生词本
               </button>
+              <button id="subtab-reader" class="subtab-btn" data-subtab="reader">
+                <i class="fa-solid fa-book-open-reader"></i> 沉浸式阅读
+              </button>
               <button id="subtab-quotes" class="subtab-btn" data-subtab="quotes">
                 <i class="fa-solid fa-quote-left"></i> 每日美句
               </button>
               <button id="subtab-cet" class="subtab-btn" data-subtab="cet">
                 <i class="fa-solid fa-award"></i> 四六级备考
+              </button>
+              <button id="subtab-dashboard" class="subtab-btn" data-subtab="dashboard">
+                <i class="fa-solid fa-chart-simple"></i> 数据看板
               </button>
             </div>
 
@@ -217,6 +238,9 @@
               <div id="academy-vocab-view" class="academy-sub-panel active">
                 <div class="vocab-controls">
                   <span class="vocab-count">生词总数: <span id="vocab-total-count">0</span></span>
+                  <span class="vocab-review-info hidden" id="vocab-review-info" style="font-size: 0.85rem; color: var(--text-muted); font-weight:600;">
+                    今日待复习: <strong id="vocab-review-count" style="color: #ef4444; font-weight:700;">0</strong>
+                  </span>
                   <div class="vocab-layout-toggles">
                     <button id="btn-toggle-vocab-list" class="mini-btn active" title="列表视图"><i class="fa-solid fa-list"></i></button>
                     <button id="btn-toggle-vocab-card" class="mini-btn" title="卡片背诵"><i class="fa-solid fa-address-card"></i></button>
@@ -251,11 +275,19 @@
                         <div class="flashcard-back">
                           <div class="card-hint">中文释义</div>
                           <p class="card-translation" id="card-back-translation">极光翻译</p>
+                          
+                          <!-- Ebbinghaus Memory Rating buttons -->
+                          <div class="card-review-bar" id="card-review-bar" style="margin: 0.75rem 0; width: 100%;">
+                            <button class="review-btn review-forgot" data-grade="1" title="完全忘记，需要立即重背">忘记</button>
+                            <button class="review-btn review-hard" data-grade="3" title="有些模糊，需要明天再背">模糊</button>
+                            <button class="review-btn review-easy" data-grade="5" title="非常熟练，可数天后复习">简单</button>
+                          </div>
+                          
                           <div class="card-examples">
                             <strong>保存于:</strong>
                             <span id="card-back-time">刚刚</span>
                           </div>
-                          <div class="card-action-hint">点击卡片返回正面</div>
+                          <div class="card-action-hint">点击卡片翻回正面，或打分进行艾宾浩斯复习</div>
                         </div>
                       </div>
                     </div>
@@ -389,6 +421,58 @@
                 </div>
               </div>
 
+              <!-- 4. Learning Dashboard Panel -->
+              <div id="academy-dashboard-view" class="academy-sub-panel">
+                <div class="dashboard-grid">
+                  <!-- Stats Row -->
+                  <div class="stats-row">
+                    <div class="stat-card">
+                      <div class="stat-icon" style="background: rgba(124, 58, 237, 0.1); color: var(--accent-primary);"><i class="fa-solid fa-language"></i></div>
+                      <div class="stat-info">
+                        <span class="stat-title">累计翻译次数</span>
+                        <span class="stat-number" id="stat-trans-total">0</span>
+                      </div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fa-solid fa-circle-check"></i></div>
+                      <div class="stat-info">
+                        <span class="stat-title">已熟记生词数</span>
+                        <span class="stat-number" id="stat-vocab-mastered">0</span>
+                      </div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--accent-secondary);"><i class="fa-solid fa-award"></i></div>
+                      <div class="stat-info">
+                        <span class="stat-title">CET刷题总量</span>
+                        <span class="stat-number" id="stat-cet-questions">0</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Charts Row -->
+                  <div class="charts-row">
+                    <div class="chart-card">
+                      <h5>📈 最近 7 日翻译字数走势</h5>
+                      <div class="chart-container">
+                        <canvas id="chart-translation-activity"></canvas>
+                      </div>
+                    </div>
+                    <div class="chart-card">
+                      <h5>📚 生词本遗忘复习阶段</h5>
+                      <div class="chart-container">
+                        <canvas id="chart-vocab-distribution"></canvas>
+                      </div>
+                    </div>
+                    <div class="chart-card chart-full" style="grid-column: span 2;">
+                      <h5>🎙️ 近期口语评测分数趋势</h5>
+                      <div class="chart-container">
+                        <canvas id="chart-oral-scores"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -403,6 +487,10 @@
 
   <!-- Custom Alert Toast Notifications -->
   <div id="toast-container" class="toast-container"></div>
+
+  <!-- External Libraries for OCR and charts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Core Script -->
   <script src="app.js"></script>

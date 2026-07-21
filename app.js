@@ -9,6 +9,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const htmlEl = document.documentElement;
   const themeToggleBtn = document.getElementById('theme-toggle');
   
+  // OCR elements
+  const sourceWrapper = document.getElementById('source-wrapper');
+  const ocrDragOverlay = document.getElementById('ocr-drag-overlay');
+  const ocrLoader = document.getElementById('ocr-loader');
+  const btnOcrHint = document.getElementById('btn-ocr-hint');
+
+  // Ebbinghaus DOM items
+  const vocabReviewInfo = document.getElementById('vocab-review-info');
+  const vocabReviewCount = document.getElementById('vocab-review-count');
+  const cardReviewBar = document.getElementById('card-review-bar');
+
+  // Reader Tab elements
+  const subtabReader = document.getElementById('subtab-reader');
+  const academyReaderView = document.getElementById('academy-reader-view');
+  const readerPasteText = document.getElementById('reader-paste-text');
+  const btnStartReading = document.getElementById('btn-start-reading');
+  const readerInputArea = document.getElementById('reader-input-area');
+  const readerReadingArea = document.getElementById('reader-reading-area');
+  const btnBackToPaste = document.getElementById('btn-back-to-paste');
+  const readerArticleContent = document.getElementById('reader-article-content');
+  const readerVocabEmpty = document.getElementById('reader-vocab-empty');
+  const readerVocabList = document.getElementById('reader-vocab-list');
+  const readerFloatBubble = document.getElementById('reader-float-bubble');
+  const bubbleTargetWord = document.getElementById('bubble-target-word');
+  const bubbleTargetPron = document.getElementById('bubble-target-pron');
+  const bubbleTargetTrans = document.getElementById('bubble-target-trans');
+  const btnBubbleSpeak = document.getElementById('btn-bubble-speak');
+  const btnBubbleAddVocab = document.getElementById('btn-bubble-add-vocab');
+
+  // Dashboard Tab elements
+  const subtabDashboard = document.getElementById('subtab-dashboard');
+  const academyDashboardView = document.getElementById('academy-dashboard-view');
+  const statTransTotal = document.getElementById('stat-trans-total');
+  const statVocabMastered = document.getElementById('stat-vocab-mastered');
+  const statCetQuestions = document.getElementById('stat-cet-questions');
+  
   const srcLangSelect = document.getElementById('src-lang');
   const tgtLangSelect = document.getElementById('tgt-lang');
   const swapLangBtn = document.getElementById('swap-lang');
@@ -146,7 +182,20 @@ document.addEventListener('DOMContentLoaded', () => {
     activeQuizIndex: 0,
     activeQuizType: 'vocab', // 'vocab' or 'reading'
     hasAnsweredQuiz: false,
-    selectedQuizOption: null
+    selectedQuizOption: null,
+
+    // NEW state items
+    stats: JSON.parse(localStorage.getItem('aura_stats')) || {
+      transDates: {},
+      oralScores: [],
+      quizCount: 0
+    },
+    charts: {
+      lineChart: null,
+      pieChart: null,
+      oralChart: null
+    },
+    readerSelectedText: ""
   };
 
   // --- Speech Setup ---
@@ -526,6 +575,98 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCet4Tab.addEventListener('click', () => switchCETTarget('cet4'));
     btnCet6Tab.addEventListener('click', () => switchCETTarget('cet6'));
 
+    // OCR drag and drop file parsing
+    if (sourceWrapper) {
+      sourceWrapper.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        sourceWrapper.classList.add('ocr-drag-over');
+        ocrDragOverlay.classList.remove('hidden');
+      });
+
+      sourceWrapper.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        sourceWrapper.classList.remove('ocr-drag-over');
+        ocrDragOverlay.classList.add('hidden');
+      });
+
+      sourceWrapper.addEventListener('drop', (e) => {
+        e.preventDefault();
+        sourceWrapper.classList.remove('ocr-drag-over');
+        ocrDragOverlay.classList.add('hidden');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+          performOCR(files[0]);
+        } else {
+          showToast('请拖入有效的图片文件！', 'error');
+        }
+      });
+    }
+
+    // Ctrl+V Paste Image for OCR
+    srcTextarea.addEventListener('paste', (e) => {
+      const items = e.clipboardData.items;
+      for (let item of items) {
+        if (item.type.indexOf('image') !== -1) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          performOCR(file);
+          break;
+        }
+      }
+    });
+
+    // Ebbinghaus card rating buttons click
+    if (cardReviewBar) {
+      cardReviewBar.querySelectorAll('.review-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const grade = parseInt(btn.dataset.grade);
+          const activeQueue = getReviewQueue();
+          let activeCard;
+          
+          if (activeQueue.length > 0) {
+            activeCard = activeQueue[state.activeCardIndex];
+          } else {
+            activeCard = state.vocabulary[state.activeCardIndex];
+          }
+          
+          if (activeCard) {
+            updateSpacedRepetition(activeCard.id, grade);
+          }
+        });
+      });
+    }
+
+    // Reader events
+    subtabReader.addEventListener('click', () => switchSubtab('reader'));
+    btnStartReading.addEventListener('click', startImmersiveReader);
+    btnBackToPaste.addEventListener('click', stopImmersiveReader);
+    
+    // Text Selection Event in Reader
+    readerArticleContent.addEventListener('mouseup', handleTextSelection);
+    document.addEventListener('mousedown', (e) => {
+      // Hide selection bubble if click outside bubble
+      if (readerFloatBubble && !readerFloatBubble.classList.contains('hidden')) {
+        if (!e.target.closest('#reader-float-bubble') && !e.target.closest('#reader-article-content')) {
+          readerFloatBubble.classList.add('hidden');
+        }
+      }
+    });
+
+    btnBubbleSpeak.addEventListener('click', () => {
+      speak(state.readerSelectedText, 'en');
+    });
+
+    btnBubbleAddVocab.addEventListener('click', () => {
+      saveToVocabularyData(state.readerSelectedText, bubbleTargetTrans.textContent);
+      addWordToReaderSidebar(state.readerSelectedText, bubbleTargetTrans.textContent);
+      readerFloatBubble.classList.add('hidden');
+    });
+
+    // Dashboard events
+    subtabDashboard.addEventListener('click', () => switchSubtab('dashboard'));
+
     // Quiz Category Switch
     document.querySelectorAll('.quiz-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -670,6 +811,16 @@ document.addEventListener('DOMContentLoaded', () => {
       srcText,
       tgtText: translatedText
     };
+
+    // Track Translation stats
+    try {
+      const todayStr = new Date().toLocaleDateString();
+      const textLen = srcText.length;
+      state.stats.transDates[todayStr] = (state.stats.transDates[todayStr] || 0) + textLen;
+      localStorage.setItem('aura_stats', JSON.stringify(state.stats));
+    } catch(e) {
+      console.log('Failed to log translation stat:', e);
+    }
 
     updateStarIconState();
 
@@ -1137,15 +1288,28 @@ document.addEventListener('DOMContentLoaded', () => {
     academyQuotesView.classList.remove('active');
     academyCetView.classList.remove('active');
     
+    subtabReader.classList.remove('active');
+    subtabDashboard.classList.remove('active');
+    academyReaderView.classList.remove('active');
+    academyDashboardView.classList.remove('active');
+
     if (subtab === 'vocab') {
       subtabVocab.classList.add('active');
       academyVocabView.classList.add('active');
+    } else if (subtab === 'reader') {
+      subtabReader.classList.add('active');
+      academyReaderView.classList.add('active');
+      stopImmersiveReader(); // Reset reader canvas state on select
     } else if (subtab === 'quotes') {
       subtabQuotes.classList.add('active');
       academyQuotesView.classList.add('active');
     } else if (subtab === 'cet') {
       subtabCet.classList.add('active');
       academyCetView.classList.add('active');
+    } else if (subtab === 'dashboard') {
+      subtabDashboard.classList.add('active');
+      academyDashboardView.classList.add('active');
+      renderDashboardCharts();
     }
     
     updateTabsUI(); // Sync the Clear button status
@@ -1350,9 +1514,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadActiveFlashcard() {
-    if (state.vocabulary.length === 0) return;
+    const activeQueue = getReviewQueue();
+    const isReviewMode = activeQueue.length > 0;
     
-    const card = state.vocabulary[state.activeCardIndex];
+    // Toggle card deck info badge
+    if (isReviewMode) {
+      vocabReviewCount.textContent = activeQueue.length;
+      vocabReviewInfo.classList.remove('hidden');
+    } else {
+      vocabReviewInfo.classList.add('hidden');
+    }
+
+    const currentDeck = isReviewMode ? activeQueue : state.vocabulary;
+    if (currentDeck.length === 0) return;
+    
+    // Wrap index safety bounds
+    if (state.activeCardIndex >= currentDeck.length) {
+      state.activeCardIndex = 0;
+    }
+    
+    const card = currentDeck[state.activeCardIndex];
     
     // Ensure we are showing front side first
     studyFlashcard.classList.remove('flipped');
@@ -1366,14 +1547,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function navigateFlashcard(direction) {
-    if (state.vocabulary.length === 0) return;
+    const activeQueue = getReviewQueue();
+    const currentDeck = activeQueue.length > 0 ? activeQueue : state.vocabulary;
+    if (currentDeck.length === 0) return;
     
     state.activeCardIndex += direction;
     
     // Loop boundary
     if (state.activeCardIndex < 0) {
-      state.activeCardIndex = state.vocabulary.length - 1;
-    } else if (state.activeCardIndex >= state.vocabulary.length) {
+      state.activeCardIndex = currentDeck.length - 1;
+    } else if (state.activeCardIndex >= currentDeck.length) {
       state.activeCardIndex = 0;
     }
     
@@ -1557,7 +1740,19 @@ document.addEventListener('DOMContentLoaded', () => {
     practiceFeedbackText.textContent = feedback;
     practiceStatusText.innerHTML = `听到您说的是: <span style="font-weight: 700; color: var(--accent-primary);">${spokenText}</span>`;
     practiceResultPanel.classList.remove('hidden');
-  }
+
+    // Save Oral Stats for charts
+    try {
+      state.stats.oralScores.push({
+        timestamp: Date.now(),
+        word: targetPracticeText,
+        score: score
+      });
+      if (state.stats.oralScores.length > 30) state.stats.oralScores.shift();
+      localStorage.setItem('aura_stats', JSON.stringify(state.stats));
+    } catch(e) {
+      console.log('Failed to save oral stats:', e);
+    }
 
 
   // --- 2. Daily Quotes logic ---
@@ -1728,6 +1923,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }, 800);
       }
+      
+      // Update Quiz counter stats
+      try {
+        state.stats.quizCount = (state.stats.quizCount || 0) + 1;
+        localStorage.setItem('aura_stats', JSON.stringify(state.stats));
+      } catch(e) {
+        console.log(e);
+      }
     } else {
       selectedBtn.classList.add('incorrect');
       quizResultBadge.textContent = '错误';
@@ -1871,6 +2074,313 @@ document.addEventListener('DOMContentLoaded', () => {
     renderWrongQuestions();
     updateWrongCount();
     showToast('错题已移出记录本', 'info');
+  }
+
+  // --- 1. OCR (Tesseract.js) Implementation ---
+  function performOCR(imageFile) {
+    if (!window.Tesseract) {
+      showToast('OCR 引擎未加载，请检查网络！', 'error');
+      return;
+    }
+
+    ocrLoader.classList.remove('hidden');
+    
+    window.Tesseract.recognize(
+      imageFile,
+      'eng',
+      { logger: m => console.log('OCR logging:', m) }
+    ).then(({ data: { text } }) => {
+      ocrLoader.classList.add('hidden');
+      if (text && text.trim()) {
+        srcTextarea.value = text.trim();
+        srcTextarea.dispatchEvent(new Event('input'));
+        showToast('图片英文提取成功，正在翻译...', 'success');
+      } else {
+        showToast('未能从图片中提取到有效英文字符！', 'warning');
+      }
+    }).catch(err => {
+      console.error('OCR processing error:', err);
+      ocrLoader.classList.add('hidden');
+      showToast('OCR 文字提取失败！', 'error');
+    });
+  }
+
+  // --- 2. Ebbinghaus (SM-2) Spaced Repetition logic ---
+  function getReviewQueue() {
+    const now = Date.now();
+    return state.vocabulary.filter(v => {
+      // If word has never been graded or memory review date has arrived/expired
+      return !v.nextReview || v.nextReview <= now;
+    });
+  }
+
+  function updateSpacedRepetition(itemId, grade) {
+    const idx = state.vocabulary.findIndex(v => v.id === itemId);
+    if (idx === -1) return;
+
+    const item = state.vocabulary[idx];
+    let ease = item.ease || 2.5;
+    let reps = item.reps || 0;
+    let interval = item.interval || 0;
+
+    // SM-2 update formula
+    if (grade >= 3) {
+      if (reps === 0) {
+        interval = 1; // 1 day
+      } else if (reps === 1) {
+        interval = 3; // 3 days
+      } else {
+        interval = Math.round(interval * ease);
+      }
+      reps++;
+    } else {
+      reps = 0;
+      interval = 1; // Repeat tomorrow
+    }
+
+    // Ease Factor adjustment
+    ease = ease + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
+    if (ease < 1.3) ease = 1.3;
+
+    item.ease = ease;
+    item.reps = reps;
+    item.interval = interval;
+    item.nextReview = Date.now() + interval * 24 * 60 * 60 * 1000;
+
+    // Save and re-render
+    localStorage.setItem('aura_vocabulary', JSON.stringify(state.vocabulary));
+    renderVocabList();
+    showToast(`复习等级已记录：该词下次复习在 ${interval} 天后`, 'success');
+  }
+
+  // --- 3. Immersive Reader Implementation ---
+  function startImmersiveReader() {
+    const articleText = readerPasteText.value.trim();
+    if (!articleText) {
+      showToast('请粘贴要阅读的文章内容！', 'warning');
+      return;
+    }
+
+    // Wrap paragraphs
+    const escapedParas = articleText.split('\n').map(p => {
+      const trimmed = p.trim();
+      return trimmed ? `<p>${escapeHTML(trimmed)}</p>` : '';
+    }).join('');
+
+    readerArticleContent.innerHTML = escapedParas;
+    readerInputArea.classList.add('hidden');
+    readerReadingArea.classList.remove('hidden');
+    
+    // Clear sidebar list
+    readerVocabList.innerHTML = '';
+    readerVocabEmpty.classList.remove('hidden');
+  }
+
+  function stopImmersiveReader() {
+    readerInputArea.classList.remove('hidden');
+    readerReadingArea.classList.add('hidden');
+    readerPasteText.value = '';
+    readerFloatBubble.classList.add('hidden');
+  }
+
+  function handleTextSelection(e) {
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+
+    // Check if selection contains valid letters
+    if (selectedText.length > 1 && /[a-zA-Z]/.test(selectedText)) {
+      state.readerSelectedText = selectedText;
+      
+      // Calculate float bubble location offset
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+
+      // Show bubble placeholder loader
+      bubbleTargetWord.textContent = selectedText;
+      bubbleTargetPron.textContent = '正在获取音标...';
+      bubbleTargetTrans.textContent = '正在加载极光翻译...';
+      
+      readerFloatBubble.classList.remove('hidden');
+      
+      // Compute bubble absolute coordinate bounds
+      const bubbleWidth = readerFloatBubble.offsetWidth || 240;
+      const bubbleHeight = readerFloatBubble.offsetHeight || 135;
+      
+      // Bubble placement calculation (above selection)
+      const topOffset = rect.top + window.scrollY - bubbleHeight - 12;
+      const leftOffset = rect.left + window.scrollX + (rect.width / 2) - (bubbleWidth / 2);
+      
+      readerFloatBubble.style.top = `${topOffset}px`;
+      readerFloatBubble.style.left = `${leftOffset}px`;
+
+      // Fetch phonetic info (Dictionary API)
+      fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(selectedText.replace(/[^a-zA-Z]/g, ''))}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data[0]) {
+            let ipa = data[0].phonetic;
+            if (!ipa && data[0].phonetics) {
+              const item = data[0].phonetics.find(p => p.text);
+              if (item) ipa = item.text;
+            }
+            bubbleTargetPron.textContent = ipa || '/音标未找到/';
+          } else {
+            bubbleTargetPron.textContent = '/音标未找到/';
+          }
+        })
+        .catch(() => {
+          bubbleTargetPron.textContent = '/音标未找到/';
+        });
+
+      // Fetch translation
+      fetchTranslation(selectedText, 'en', 'zh-CN')
+        .then(transText => {
+          bubbleTargetTrans.textContent = transText;
+        })
+        .catch(err => {
+          console.error(err);
+          bubbleTargetTrans.textContent = '翻译超时，请稍后重试。';
+        });
+    } else {
+      // Hide tooltip if invalid selection
+      readerFloatBubble.classList.add('hidden');
+    }
+  }
+
+  function addWordToReaderSidebar(word, translation) {
+    readerVocabEmpty.classList.add('hidden');
+    
+    // Render item dynamically
+    const li = document.createElement('li');
+    li.className = 'record-item';
+    li.innerHTML = `
+      <div class="record-header">
+        <span class="record-langs">阅读积累</span>
+        <button class="record-action-btn speak-read-btn"><i class="fa-solid fa-volume-high"></i></button>
+      </div>
+      <div class="record-body">
+        <div class="record-src">${escapeHTML(word)}</div>
+        <div class="record-tgt">${escapeHTML(translation)}</div>
+      </div>
+    `;
+
+    li.querySelector('.speak-read-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      speak(word, 'en');
+    });
+
+    readerVocabList.insertBefore(li, readerVocabList.firstChild);
+  }
+
+  // --- 4. Chart.js Dashboard visual rendering ---
+  function renderDashboardCharts() {
+    if (!window.Chart) {
+      showToast('图表引擎渲染异常，请刷新！', 'error');
+      return;
+    }
+
+    // Set header metrics
+    statTransTotal.textContent = Object.values(state.stats.transDates).reduce((acc, curr) => acc + curr, 0);
+    
+    // Count mastered vocab (ease factor >= 2.8 and reps >= 3)
+    const masteredCount = state.vocabulary.filter(v => v.ease >= 2.8 && v.reps >= 3).length;
+    statVocabMastered.textContent = masteredCount;
+    statCetQuestions.textContent = state.stats.quizCount || 0;
+
+    // Destroy existing charts to reload clean canvas
+    if (state.charts.lineChart) state.charts.lineChart.destroy();
+    if (state.charts.pieChart) state.charts.pieChart.destroy();
+    if (state.charts.oralChart) state.charts.oralChart.destroy();
+
+    // Chart 1: Translation activity (Last 7 Days)
+    const ctx1 = document.getElementById('chart-translation-activity').getContext('2d');
+    const labels1 = [];
+    const data1 = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toLocaleDateString();
+      labels1.push(d.getMonth() + 1 + '月' + d.getDate() + '日');
+      data1.push(state.stats.transDates[dateStr] || 0);
+    }
+
+    state.charts.lineChart = new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: labels1,
+        datasets: [{
+          label: '每日翻译字数',
+          data: data1,
+          borderColor: '#7c3aed',
+          backgroundColor: 'rgba(124, 58, 237, 0.15)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { grid: { display: false }, ticks: { precision: 0 } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+
+    // Chart 2: Ebbinghaus stages distribution
+    const ctx2 = document.getElementById('chart-vocab-distribution').getContext('2d');
+    const now = Date.now();
+    const pendingReviews = state.vocabulary.filter(v => !v.nextReview || v.nextReview <= now).length;
+    const learningCount = state.vocabulary.length - pendingReviews - masteredCount;
+
+    state.charts.pieChart = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: ['今日待复习', '记忆中', '已熟记'],
+        datasets: [{
+          data: [pendingReviews, Math.max(0, learningCount), masteredCount],
+          backgroundColor: ['#ef4444', '#2563eb', '#10b981'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true } }
+        }
+      }
+    });
+
+    // Chart 3: Oral pronunciation scores trends (Last 10 records)
+    const ctx3 = document.getElementById('chart-oral-scores').getContext('2d');
+    const recentScores = state.stats.oralScores.slice(-10);
+    const labels3 = recentScores.map((_, i) => `第 ${i+1} 次`);
+    const data3 = recentScores.map(s => s.score);
+
+    state.charts.oralChart = new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: labels3.length > 0 ? labels3 : ['暂无数据'],
+        datasets: [{
+          label: '匹配得分',
+          data: data3.length > 0 ? data3 : [0],
+          backgroundColor: 'rgba(59, 130, 246, 0.75)',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { max: 100, min: 0 },
+          x: { grid: { display: false } }
+        }
+      }
+    });
   }
 
   // --- Run Init ---
