@@ -50,6 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const statTransTotal = document.getElementById('stat-trans-total');
   const statVocabMastered = document.getElementById('stat-vocab-mastered');
   const statCetQuestions = document.getElementById('stat-cet-questions');
+
+  // TTS speed & CSV export elements
+  const ttsSpeedSlider = document.getElementById('tts-speed-slider');
+  const ttsSpeedLabel = document.getElementById('tts-speed-label');
+  const btnExportVocab = document.getElementById('btn-export-vocab');
+
+  // Reading history shelf elements
+  const readerHistoryBookshelf = document.getElementById('reader-history-bookshelf');
+  const readerHistoryList = document.getElementById('reader-history-list');
   
   const srcLangSelect = document.getElementById('src-lang');
   const tgtLangSelect = document.getElementById('tgt-lang');
@@ -201,7 +210,11 @@ document.addEventListener('DOMContentLoaded', () => {
       pieChart: null,
       oralChart: null
     },
-    readerSelectedText: ""
+    readerSelectedText: "",
+    
+    // Optimized features state
+    ttsSpeed: parseFloat(localStorage.getItem('aura_tts_speed')) || 1.0,
+    readerHistory: JSON.parse(localStorage.getItem('aura_reader_history')) || []
   };
 
   // Defensive array checks to prevent type errors on null localStorage items
@@ -683,6 +696,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dashboard events
     subtabDashboard.addEventListener('click', () => switchSubtab('dashboard'));
 
+    // TTS Speed change slider
+    if (ttsSpeedSlider) {
+      ttsSpeedSlider.addEventListener('input', () => {
+        state.ttsSpeed = parseFloat(ttsSpeedSlider.value);
+        if (ttsSpeedLabel) ttsSpeedLabel.textContent = state.ttsSpeed.toFixed(1) + 'x';
+        localStorage.setItem('aura_tts_speed', state.ttsSpeed);
+      });
+    }
+
+    // CSV Vocab export trigger
+    if (btnExportVocab) {
+      btnExportVocab.addEventListener('click', exportVocabularyToCSV);
+    }
+
+    // Mobile camera click OCR bridge
+    const ocrCameraInput = document.createElement('input');
+    ocrCameraInput.type = 'file';
+    ocrCameraInput.accept = 'image/*';
+    ocrCameraInput.capture = 'environment';
+    ocrCameraInput.style.display = 'none';
+    document.body.appendChild(ocrCameraInput);
+
+    if (btnOcrHint) {
+      btnOcrHint.addEventListener('click', () => {
+        ocrCameraInput.click();
+      });
+    }
+
+    ocrCameraInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        performOCR(e.target.files[0]);
+      }
+    });
+
     // Quiz Category Switch
     document.querySelectorAll('.quiz-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -696,6 +743,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnNextQuestion.addEventListener('click', () => {
       state.activeQuizIndex++;
+      
+      // Save current breakpoint index progress
+      const target = state.cetProgress.activeTarget;
+      const type = state.activeQuizType;
+      const savedIndexKey = `${target}${type === 'vocab' ? 'Vocab' : 'Reading'}Index`;
+      state.cetProgress[savedIndexKey] = state.activeQuizIndex;
+      localStorage.setItem('aura_cet_progress', JSON.stringify(state.cetProgress));
+
       loadQuizQuestion();
     });
 
@@ -1316,6 +1371,7 @@ document.addEventListener('DOMContentLoaded', () => {
       subtabReader.classList.add('active');
       academyReaderView.classList.add('active');
       stopImmersiveReader(); // Reset reader canvas state on select
+      renderReaderHistoryShelf();
     } else if (subtab === 'quotes') {
       subtabQuotes.classList.add('active');
       academyQuotesView.classList.add('active');
@@ -1867,6 +1923,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function loadQuizQuestion() {
     const target = state.cetProgress.activeTarget; // 'cet4' or 'cet6'
     const type = state.activeQuizType; // 'vocab' or 'reading'
+    
+    // Auto restore previous quiz breakpoint index from cetProgress
+    const savedIndexKey = `${target}${type === 'vocab' ? 'Vocab' : 'Reading'}Index`;
+    if (state.activeQuizIndex === 0 && state.cetProgress[savedIndexKey] !== undefined) {
+      state.activeQuizIndex = state.cetProgress[savedIndexKey];
+    }
+    
     const bank = cetQuizzesDatabase[target][type];
     
     // Reset answer logs
@@ -2187,6 +2250,9 @@ document.addEventListener('DOMContentLoaded', () => {
     readerArticleContent.innerHTML = escapedParas;
     readerInputArea.classList.add('hidden');
     readerReadingArea.classList.remove('hidden');
+
+    // Save article to bookshelf history
+    saveReaderArticleToHistory(articleText.substring(0, 25), articleText);
     
     // Clear sidebar list
     readerVocabList.innerHTML = '';
@@ -2398,6 +2464,106 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+  }
+
+  // --- 5. Export Vocabulary to standard CSV file ---
+  function exportVocabularyToCSV() {
+    if (state.vocabulary.length === 0) {
+      showToast('生词本为空，无需导出！', 'warning');
+      return;
+    }
+
+    let csvContent = "\ufeff"; // Add UTF-8 BOM for Excel Chinese characters compatibility
+    csvContent += "单词,中文释义,音标,保存时间,艾宾浩斯EF值,复习次数,下一次复习时间\n";
+    
+    state.vocabulary.forEach(item => {
+      const dateStr = new Date(item.timestamp).toLocaleString().replace(/,/g, " ");
+      const word = item.word.replace(/"/g, '""');
+      const trans = item.translation.replace(/"/g, '""');
+      const pron = (item.pron || "").replace(/"/g, '""');
+      const nextRev = item.nextReview ? new Date(item.nextReview).toLocaleString().replace(/,/g, " ") : "立即复习";
+      
+      csvContent += `"${word}","${trans}","${pron}","${dateStr}",${item.ease || 2.5},${item.reps || 0},"${nextRev}"\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `AuraTranslate_生词本_${new Date().toLocaleDateString()}.csv`;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+
+    showToast('生词本已导出为标准 Excel/Anki 兼容 CSV 格式！', 'success');
+  }
+
+  // --- 6. Immersive Reader BookShelf Article Saving ---
+  function saveReaderArticleToHistory(title, text) {
+    if (!title || !text) return;
+    
+    const existsIdx = state.readerHistory.findIndex(h => h.text.trim() === text.trim());
+    if (existsIdx !== -1) {
+      const item = state.readerHistory.splice(existsIdx, 1)[0];
+      state.readerHistory.unshift(item);
+    } else {
+      state.readerHistory.unshift({
+        id: 'read_' + Date.now(),
+        title: title.length > 15 ? title.substring(0, 15) + '...' : title,
+        text: text,
+        timestamp: Date.now()
+      });
+    }
+
+    if (state.readerHistory.length > 5) {
+      state.readerHistory.pop();
+    }
+
+    localStorage.setItem('aura_reader_history', JSON.stringify(state.readerHistory));
+    renderReaderHistoryShelf();
+  }
+
+  function renderReaderHistoryShelf() {
+    if (!readerHistoryBookshelf || !readerHistoryList) return;
+    if (state.readerHistory.length === 0) {
+      readerHistoryBookshelf.classList.add('hidden');
+      return;
+    }
+
+    readerHistoryBookshelf.classList.remove('hidden');
+    readerHistoryList.innerHTML = '';
+
+    state.readerHistory.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'mini-btn';
+      btn.style.cssText = 'font-size:0.75rem; display: flex; align-items: center; gap: 0.35rem; border-radius: 12px; padding: 0.35rem 0.65rem; background: var(--input-bg); margin-bottom: 0.25rem;';
+      btn.innerHTML = `<i class="fa-solid fa-file-lines" style="color: var(--accent-primary);"></i> <span>${escapeHTML(item.title)}</span> <i class="fa-solid fa-xmark delete-history-btn" style="font-size:0.6rem; color:var(--text-muted); cursor:pointer; margin-left:0.25rem;" title="删除此记录"></i>`;
+      
+      btn.addEventListener('click', (e) => {
+        if (e.target.closest('.delete-history-btn')) {
+          e.stopPropagation();
+          deleteReaderHistory(item.id);
+          return;
+        }
+        readerPasteText.value = item.text;
+        startImmersiveReader();
+        showToast('已加载历史阅读文章', 'success');
+      });
+
+      readerHistoryList.appendChild(btn);
+    });
+  }
+
+  function deleteReaderHistory(id) {
+    state.readerHistory = state.readerHistory.filter(h => h.id !== id);
+    localStorage.setItem('aura_reader_history', JSON.stringify(state.readerHistory));
+    renderReaderHistoryShelf();
+    showToast('已从历史书架移除', 'info');
   }
 
   // --- Run Init ---

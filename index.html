@@ -48,6 +48,13 @@
       </div>
       
       <div class="header-actions">
+        <!-- TTS speed adjustment -->
+        <div class="tts-speed-control" style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.75rem; background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.25rem 0.6rem; border-radius: 20px;">
+          <i class="fa-solid fa-gauge-high" style="color: var(--accent-primary); font-size: 0.8rem;" title="朗读语速"></i>
+          <input type="range" id="tts-speed-slider" min="0.5" max="1.8" step="0.1" value="1.0" style="width: 50px; cursor: pointer; height: 3px; accent-color: var(--accent-primary); margin: 0;">
+          <span id="tts-speed-label" style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; width: 25px;">1.0x</span>
+        </div>
+        
         <button id="theme-toggle" class="icon-btn" title="切换主题" aria-label="Toggle Theme">
           <i class="fa-solid fa-moon"></i>
         </button>
@@ -242,6 +249,7 @@
                     今日待复习: <strong id="vocab-review-count" style="color: #ef4444; font-weight:700;">0</strong>
                   </span>
                   <div class="vocab-layout-toggles">
+                    <button id="btn-export-vocab" class="mini-btn" title="导出生词本 (CSV格式)" style="margin-right: 0.5rem;"><i class="fa-solid fa-file-export"></i> 导出</button>
                     <button id="btn-toggle-vocab-list" class="mini-btn active" title="列表视图"><i class="fa-solid fa-list"></i></button>
                     <button id="btn-toggle-vocab-card" class="mini-btn" title="卡片背诵"><i class="fa-solid fa-address-card"></i></button>
                   </div>
@@ -331,6 +339,13 @@
                   <!-- Text Paste Area -->
                   <div class="reader-input-area" id="reader-input-area">
                     <textarea id="reader-paste-text" placeholder="在这里粘贴您的英文长篇文章、学术论文或真题阅读原文..."></textarea>
+                    
+                    <!-- Reading History bookshelf -->
+                    <div id="reader-history-bookshelf" class="reader-history-bookshelf hidden" style="margin-top: 0.75rem; text-align: left;">
+                      <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:700; display: block; margin-bottom: 0.4rem;"><i class="fa-solid fa-clock-rotate-left"></i> 最近阅读历史：</span>
+                      <div id="reader-history-list" class="reader-history-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                    </div>
+
                     <div style="text-align: right; margin-top: 0.75rem;">
                       <button id="btn-start-reading" class="glow-btn">
                         <span>开始沉浸式阅读</span>
