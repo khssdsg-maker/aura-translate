@@ -1753,6 +1753,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e) {
       console.log('Failed to save oral stats:', e);
     }
+  }
 
 
   // --- 2. Daily Quotes logic ---
