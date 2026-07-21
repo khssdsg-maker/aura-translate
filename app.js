@@ -253,6 +253,14 @@ document.addEventListener('DOMContentLoaded', () => {
     'pt': 'pt-PT'
   };
 
+  // Pre-load system TTS voices asynchronously for Chrome / Edge stability
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', () => {
+      window.speechSynthesis.getVoices();
+    });
+  }
+
   // --- Databases ---
   
   // Handpicked Bilingual Daily Quotes with Vocab Extractions
