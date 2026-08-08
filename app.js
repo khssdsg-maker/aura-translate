@@ -81,6 +81,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAiGenerateQuiz = document.getElementById('btn-ai-generate-quiz');
   const btnImportQuizBank = document.getElementById('btn-import-quiz-bank');
   const quizBankFileInput = document.getElementById('quiz-bank-file-input');
+
+  // Phase 5 Word Learning DOM elements
+  const subtabWordLearning = document.getElementById('subtab-word-learning');
+  const academyWordLearningView = document.getElementById('academy-word-learning-view');
+  const courseBookSelect = document.getElementById('course-book-select');
+  const courseGoalSelect = document.getElementById('course-goal-select');
+  const courseProgressText = document.getElementById('course-progress-text');
+  const btnStudySpeak = document.getElementById('btn-study-speak');
+  const studyWordTitle = document.getElementById('study-word-title');
+  const studyWordPron = document.getElementById('study-word-pron');
+  const studyWordPos = document.getElementById('study-word-pos');
+  const studyWordTrans = document.getElementById('study-word-trans');
+  const studyWordExEn = document.getElementById('study-word-ex-en');
+  const studyWordExZh = document.getElementById('study-word-ex-zh');
+  const inputWordSpelling = document.getElementById('input-word-spelling');
+  const btnSubmitSpelling = document.getElementById('btn-submit-spelling');
+  const btnAddStudyVocab = document.getElementById('btn-add-study-vocab');
+  const btnNextStudyWord = document.getElementById('btn-next-study-word');
   
   const srcLangSelect = document.getElementById('src-lang');
   const tgtLangSelect = document.getElementById('tgt-lang');
@@ -241,7 +259,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Phase 4 State
     engine: localStorage.getItem('aura_engine') || 'default',
     customApiKey: localStorage.getItem('aura_custom_api_key') || '',
-    customQuizBank: JSON.parse(localStorage.getItem('aura_custom_quiz_bank')) || []
+    customQuizBank: JSON.parse(localStorage.getItem('aura_custom_quiz_bank')) || [],
+
+    // Phase 5 Word Course State
+    wordCourse: JSON.parse(localStorage.getItem('aura_word_course_state')) || {
+      activeBook: 'cet4',
+      dailyGoal: 20,
+      bookProgress: { cet4: 0, cet6: 0, kaoyan: 0, ielts: 0 },
+      currentWordIndex: 0
+    },
+    wordCoursesDatabase: null
   };
 
   // Defensive array checks to prevent type errors on null localStorage items
@@ -762,6 +789,54 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('aura_custom_api_key', state.customApiKey);
         keyModal.classList.add('hidden');
         showToast(state.customApiKey ? 'API Key 已安全保存！' : 'API Key 已清空', 'success');
+      });
+    }
+
+    // Phase 5: Word Learning events
+    if (subtabWordLearning) {
+      subtabWordLearning.addEventListener('click', () => switchSubtab('word-learning'));
+    }
+    if (courseBookSelect) {
+      courseBookSelect.value = state.wordCourse.activeBook;
+      courseBookSelect.addEventListener('change', () => {
+        state.wordCourse.activeBook = courseBookSelect.value;
+        state.wordCourse.currentWordIndex = state.wordCourse.bookProgress[state.wordCourse.activeBook] || 0;
+        saveWordCourseState();
+        renderCurrentWordStudy();
+      });
+    }
+    if (courseGoalSelect) {
+      courseGoalSelect.value = state.wordCourse.dailyGoal;
+      courseGoalSelect.addEventListener('change', () => {
+        state.wordCourse.dailyGoal = parseInt(courseGoalSelect.value);
+        saveWordCourseState();
+      });
+    }
+    if (btnStudySpeak) {
+      btnStudySpeak.addEventListener('click', () => {
+        const word = studyWordTitle.textContent.trim();
+        if (word) speak(word, 'en');
+      });
+    }
+    if (btnSubmitSpelling) {
+      btnSubmitSpelling.addEventListener('click', submitWordSpelling);
+    }
+    if (btnAddStudyVocab) {
+      btnAddStudyVocab.addEventListener('click', () => {
+        const word = studyWordTitle.textContent.trim();
+        const trans = studyWordTrans.textContent.trim();
+        saveToVocabularyData(word, trans);
+      });
+    }
+    if (btnNextStudyWord) {
+      btnNextStudyWord.addEventListener('click', nextStudyWord);
+    }
+    if (inputWordSpelling) {
+      inputWordSpelling.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitWordSpelling();
+        }
       });
     }
 
@@ -1470,12 +1545,18 @@ document.addEventListener('DOMContentLoaded', () => {
     academyQuotesView.classList.remove('active');
     academyCetView.classList.remove('active');
     
+    if (subtabWordLearning) subtabWordLearning.classList.remove('active');
+    if (academyWordLearningView) academyWordLearningView.classList.remove('active');
     subtabReader.classList.remove('active');
     subtabDashboard.classList.remove('active');
     academyReaderView.classList.remove('active');
     academyDashboardView.classList.remove('active');
 
-    if (subtab === 'vocab') {
+    if (subtab === 'word-learning') {
+      if (subtabWordLearning) subtabWordLearning.classList.add('active');
+      if (academyWordLearningView) academyWordLearningView.classList.add('active');
+      renderCurrentWordStudy();
+    } else if (subtab === 'vocab') {
       subtabVocab.classList.add('active');
       academyVocabView.classList.add('active');
     } else if (subtab === 'reader') {
@@ -2862,6 +2943,104 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
     reader.readAsText(file, 'utf-8');
+  }
+
+  // --- Phase 5: Word Course Systematic Learning Functions ---
+  function loadWordCourseData() {
+    fetch('word_courses.json')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) {
+          state.wordCoursesDatabase = data;
+          renderCurrentWordStudy();
+        }
+      })
+      .catch(e => console.log('word_courses.json load skipped:', e));
+  }
+
+  function saveWordCourseState() {
+    localStorage.setItem('aura_word_course_state', JSON.stringify(state.wordCourse));
+  }
+
+  function getActiveCourseList() {
+    if (state.wordCoursesDatabase && state.wordCoursesDatabase[state.wordCourse.activeBook]) {
+      return state.wordCoursesDatabase[state.wordCourse.activeBook];
+    }
+    // Default fallback list
+    return [
+      {
+        word: "abandon",
+        pron: "/əˈbændən/",
+        pos: "v.",
+        trans: "放弃，抛弃，离弃",
+        exampleEn: "The soldiers were ordered to abandon their post.",
+        exampleZh: "士兵们接到命令放弃他们的阵地。"
+      },
+      {
+        word: "efficient",
+        pron: "/ɪˈfɪʃnt/",
+        pos: "adj.",
+        trans: "高效的，有能力的",
+        exampleEn: "Modern technology makes our work much more efficient.",
+        exampleZh: "现代技术使我们的工作效率大为提高。"
+      }
+    ];
+  }
+
+  function renderCurrentWordStudy() {
+    if (!studyWordTitle) return;
+    const list = getActiveCourseList();
+    
+    if (state.wordCourse.currentWordIndex >= list.length) {
+      state.wordCourse.currentWordIndex = 0;
+    }
+    
+    const wordObj = list[state.wordCourse.currentWordIndex];
+    if (!wordObj) return;
+
+    studyWordTitle.textContent = wordObj.word;
+    studyWordPron.textContent = wordObj.pron || `/${wordObj.word.toLowerCase()}/`;
+    studyWordPos.textContent = wordObj.pos || 'v.';
+    studyWordTrans.textContent = wordObj.trans || '';
+    studyWordExEn.textContent = wordObj.exampleEn || '';
+    studyWordExZh.textContent = wordObj.exampleZh || '';
+    if (inputWordSpelling) inputWordSpelling.value = '';
+
+    if (courseProgressText) {
+      courseProgressText.textContent = `${state.wordCourse.currentWordIndex + 1} / ${list.length}`;
+    }
+  }
+
+  function submitWordSpelling() {
+    if (!inputWordSpelling) return;
+    const input = inputWordSpelling.value.trim().toLowerCase();
+    const target = studyWordTitle.textContent.trim().toLowerCase();
+
+    if (!input) {
+      showToast('请输入拼写！', 'warning');
+      return;
+    }
+
+    if (input === target) {
+      showToast('拼写完美无误！正确率 100%', 'success');
+      setTimeout(() => {
+        nextStudyWord();
+      }, 600);
+    } else {
+      showToast(`拼写错误！正确拼写为: ${target}`, 'error');
+    }
+  }
+
+  function nextStudyWord() {
+    const list = getActiveCourseList();
+    state.wordCourse.currentWordIndex++;
+    if (state.wordCourse.currentWordIndex >= list.length) {
+      state.wordCourse.currentWordIndex = 0;
+      showToast('恭喜您已完成本词汇书的第一轮学习！开启循环巩固。', 'success');
+    }
+    state.wordCourse.bookProgress[state.wordCourse.activeBook] = state.wordCourse.currentWordIndex;
+    saveWordCourseState();
+    renderCurrentWordStudy();
   }
 
   // --- Run Init ---

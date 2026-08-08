@@ -1,0 +1,106 @@
+{
+  "cet4": [
+    {
+      "word": "abandon",
+      "pron": "/əˈbændən/",
+      "pos": "v.",
+      "trans": "放弃，抛弃，离弃",
+      "exampleEn": "The soldiers were ordered to abandon their post.",
+      "exampleZh": "士兵们接到命令放弃他们的阵地。"
+    },
+    {
+      "word": "candidate",
+      "pron": "/ˈkændɪdət/",
+      "pos": "n.",
+      "trans": "候选人，求职者",
+      "exampleEn": "She is a strong candidate for the job.",
+      "exampleZh": "她是这个职位的强有力候选人。"
+    },
+    {
+      "word": "discipline",
+      "pron": "/ˈdɪsəplɪn/",
+      "pos": "n./v.",
+      "trans": "纪律，自律；训练",
+      "exampleEn": "Self-discipline is essential for learning online.",
+      "exampleZh": "自律对于在线学习至关重要。"
+    },
+    {
+      "word": "efficient",
+      "pron": "/ɪˈfɪʃnt/",
+      "pos": "adj.",
+      "trans": "高效的，有能力的",
+      "exampleEn": "Modern technology makes our work much more efficient.",
+      "exampleZh": "现代技术使我们的工作效率大为提高。"
+    },
+    {
+      "word": "guarantee",
+      "pron": "/ˌɡærənˈtiː/",
+      "pos": "v./n.",
+      "trans": "保证，担保",
+      "exampleEn": "Hard work alone cannot guarantee success, but it helps.",
+      "exampleZh": "单凭努力不能保证成功，但很有帮助。"
+    }
+  ],
+  "cet6": [
+    {
+      "word": "advocate",
+      "pron": "/ˈædvəkət/",
+      "pos": "v./n.",
+      "trans": "提倡，拥护；倡导者",
+      "exampleEn": "Many experts advocate for sustainable energy solutions.",
+      "exampleZh": "许多专家倡导使用可持续能源解决方案。"
+    },
+    {
+      "word": "comprehensive",
+      "pron": "/ˌkɒmprɪˈhensɪv/",
+      "pos": "adj.",
+      "trans": "综合的，全面的",
+      "exampleEn": "The report provides a comprehensive review of the market.",
+      "exampleZh": "该报告对市场进行了全面的审查。"
+    },
+    {
+      "word": "subtle",
+      "pron": "/ˈsʌtl/",
+      "pos": "adj.",
+      "trans": "微妙的，细微的",
+      "exampleEn": "There is a subtle difference between the two terms.",
+      "exampleZh": "这两个术语之间存在细微的区别。"
+    }
+  ],
+  "kaoyan": [
+    {
+      "word": "ambiguous",
+      "pron": "/æmˈbɪɡjuəs/",
+      "pos": "adj.",
+      "trans": "模棱两可的，含糊不清的",
+      "exampleEn": "The instructions were ambiguous and caused confusion.",
+      "exampleZh": "这些指令含糊不清，引起了混乱。"
+    },
+    {
+      "word": "prevalent",
+      "pron": "/ˈprevələnt/",
+      "pos": "adj.",
+      "trans": "流行的，普遍的",
+      "exampleEn": "Online shopping has become prevalent worldwide.",
+      "exampleZh": "网上购物在全球范围内已变得非常普遍。"
+    }
+  ],
+  "ielts": [
+    {
+      "word": "fluctuate",
+      "pron": "/ˈflʌktʃueɪt/",
+      "pos": "v.",
+      "trans": "波动，起伏",
+      "exampleEn": "Temperatures fluctuate wildly in the desert at night.",
+      "exampleZh": "沙漠里的气温在夜间大幅波动。"
+    },
+    {
+      "word": "substantial",
+      "pron": "/səbˈstænʃl/",
+      "pos": "adj.",
+      "trans": "大量的，实质性的",
+      "exampleEn": "The company reported a substantial increase in profits.",
+      "exampleZh": "该公司报告利润大幅增加。"
+    }
+  ]
+}

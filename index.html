@@ -254,6 +254,9 @@
           <div id="academy-panel" class="tab-panel">
             <!-- Academy Sub navigation bar -->
             <div class="academy-nav">
+              <button id="subtab-word-learning" class="subtab-btn" data-subtab="word-learning">
+                <i class="fa-solid fa-graduation-cap"></i> 单词学习
+              </button>
               <button id="subtab-vocab" class="subtab-btn active" data-subtab="vocab">
                 <i class="fa-solid fa-book"></i> 生词本
               </button>
@@ -274,6 +277,71 @@
             <!-- Academy Sub-panels content -->
             <div class="academy-sub-content">
               
+              <!-- 0. Word Learning Course Panel -->
+              <div id="academy-word-learning-view" class="academy-sub-panel">
+                <div class="word-course-container">
+                  <!-- Header Controls: Book selector & Goal -->
+                  <div class="course-header-controls" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.85rem 1.15rem; border-radius: 16px; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <i class="fa-solid fa-book-bookmark" style="color: var(--accent-primary);"></i>
+                      <select id="course-book-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.35rem 0.65rem; color: var(--text-main); font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer;">
+                        <option value="cet4">四级核心词汇 (CET-4)</option>
+                        <option value="cet6">六级高频词汇 (CET-6)</option>
+                        <option value="kaoyan">考研英语必备 (Postgraduate)</option>
+                        <option value="ielts">雅思核心词汇 (IELTS)</option>
+                      </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:600;">每日目标:</span>
+                      <select id="course-goal-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.35rem 0.5rem; color: var(--text-main); font-weight: 700; font-size: 0.8rem; outline: none;">
+                        <option value="10">10 词/日</option>
+                        <option value="20" selected>20 词/日</option>
+                        <option value="50">50 词/日</option>
+                      </select>
+                      <span style="font-size: 0.8rem; color: var(--text-main); font-weight: 700;">进度: <span id="course-progress-text" style="color: var(--accent-primary);">0 / 0</span></span>
+                    </div>
+                  </div>
+
+                  <!-- Learning Card Arena -->
+                  <div class="word-study-card" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; text-align: center; box-shadow: var(--glass-shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                      <span class="status-badge" id="study-step-badge">第 1 步：全感官识记</span>
+                      <button id="btn-study-speak" class="mini-icon-btn" title="发音"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <h2 id="study-word-title" style="font-family: var(--font-title); font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Word</h2>
+                    <div id="study-word-pron" style="font-size: 1rem; color: var(--accent-secondary); margin-bottom: 0.85rem;">/pron/</div>
+                    
+                    <div id="study-word-trans-box" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 1rem; display: inline-block; width: 100%;">
+                      <span id="study-word-pos" style="font-weight: 800; color: var(--accent-primary); margin-right: 0.5rem;">v.</span>
+                      <span id="study-word-trans" style="font-size: 1.05rem; color: var(--text-main); font-weight: 600;">翻译释义</span>
+                    </div>
+
+                    <!-- Bilingual Sentence -->
+                    <div style="text-align: left; background: rgba(124, 58, 237, 0.05); border-left: 3px solid var(--accent-primary); padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+                      <p id="study-word-ex-en" style="font-size: 0.95rem; color: var(--text-main); font-weight: 500; margin-bottom: 0.25rem;">Example sentence loading...</p>
+                      <p id="study-word-ex-zh" style="font-size: 0.85rem; color: var(--text-muted);">双语例句加载中...</p>
+                    </div>
+
+                    <!-- Spelling Quiz Area -->
+                    <div id="spelling-quiz-area" style="margin-bottom: 1.25rem;">
+                      <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">默写拼写检测：</label>
+                      <div style="display: flex; justify-content: center; gap: 0.5rem;">
+                        <input type="text" id="input-word-spelling" placeholder="输入正确的英文拼写..." style="width: 240px; padding: 0.6rem 0.8rem; border-radius: 12px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main); font-size: 1rem; text-align: center; outline: none; font-weight: 700;">
+                        <button id="btn-submit-spelling" class="glow-btn-outline" style="padding: 0.6rem 1rem;">验证</button>
+                      </div>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+                      <button id="btn-add-study-vocab" class="text-link-btn font-bold"><i class="fa-solid fa-plus"></i> 加入生词本</button>
+                      <button id="btn-next-study-word" class="glow-btn"><span>下一个词</span> <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- 1. Vocabulary & Flashcards Panel -->
               <div id="academy-vocab-view" class="academy-sub-panel active">
                 <div class="vocab-controls">
