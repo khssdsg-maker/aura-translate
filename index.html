@@ -272,6 +272,24 @@
           <!-- 0. Word Learning Course Panel -->
           <div id="academy-word-learning-view" class="academy-sub-panel active">
             <div class="word-course-container">
+              <!-- Background Audio Loop Player (磨耳朵随身听) -->
+              <div class="audio-player-bar" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(37, 99, 235, 0.08)); border: 1px solid var(--glass-border); padding: 0.75rem 1.15rem; border-radius: 16px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <button id="btn-audio-loop-play" class="glow-btn" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+                    <i class="fa-solid fa-headphones"></i> <span id="audio-loop-status-text">开启磨耳朵听词</span>
+                  </button>
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:600;">当前播放: <strong id="audio-loop-current-word" style="color: var(--text-main);">未开启</strong></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">间隔:</span>
+                  <select id="audio-loop-interval" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 0.2rem 0.4rem; font-size: 0.75rem; color: var(--text-main); outline:none;">
+                    <option value="2">2 秒</option>
+                    <option value="3" selected>3 秒</option>
+                    <option value="5">5 秒</option>
+                  </select>
+                </div>
+              </div>
+
               <div class="course-header-controls" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.85rem 1.15rem; border-radius: 16px; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                   <i class="fa-solid fa-book-bookmark" style="color: var(--accent-primary);"></i>
@@ -391,8 +409,11 @@
       <!-- Section 3: 📖 语句学习 (Sentence & Reading Hub) -->
       <section id="section-sentences" class="main-section">
         <div class="academy-nav" style="margin-bottom: 1.25rem;">
-          <button id="subtab-reader" class="subtab-btn active" data-subtab="reader">
-            <i class="fa-solid fa-book-open-reader"></i> 沉浸式划词阅读
+          <button id="subtab-voice-chat" class="subtab-btn active" data-subtab="voice-chat">
+            <i class="fa-solid fa-comments"></i> AI 口语情景陪练
+          </button>
+          <button id="subtab-reader" class="subtab-btn" data-subtab="reader">
+            <i class="fa-solid fa-book-open-reader"></i> 沉浸划词 & 文档解析
           </button>
           <button id="subtab-quotes" class="subtab-btn" data-subtab="quotes">
             <i class="fa-solid fa-quote-left"></i> 每日双语美句
@@ -403,10 +424,50 @@
         </div>
 
         <div class="academy-sub-content">
+          <!-- 0.5 AI Voice Companion Panel -->
+          <div id="academy-voice-chat-view" class="academy-sub-panel active">
+            <div class="voice-chat-container" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; box-shadow: var(--glass-shadow);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <i class="fa-solid fa-headset" style="font-size: 1.2rem; color: var(--accent-primary);"></i>
+                  <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">选择对话情景：</span>
+                  <select id="voice-scenario-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.4rem 0.75rem; color: var(--text-main); font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer;">
+                    <option value="interview">模拟外企求职面试 (Job Interview)</option>
+                    <option value="coffee">咖啡馆点餐练习 (Coffee Shop Order)</option>
+                    <option value="travel">机场海关与问路 (Travel & Customs)</option>
+                    <option value="daily">日常自由闲聊 (Free Conversation)</option>
+                  </select>
+                </div>
+                <button id="btn-reset-voice-chat" class="mini-btn" style="color: var(--text-muted);"><i class="fa-solid fa-rotate-left"></i> 重置对话</button>
+              </div>
+
+              <!-- Dialogue Message History Feed -->
+              <div id="voice-chat-feed" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1rem; min-height: 260px; max-height: 380px; overflow-y: auto; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem;">
+                <div class="chat-msg ai-msg" style="align-self: flex-start; max-width: 80%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.75rem 1rem; border-radius: 14px; border-bottom-left-radius: 2px;">
+                  <div style="font-size: 0.75rem; color: var(--accent-primary); font-weight: 700; margin-bottom: 0.25rem;"><i class="fa-solid fa-robot"></i> AI Partner</div>
+                  <p id="initial-ai-greeting" style="font-size: 0.95rem; color: var(--text-main); margin: 0;">Hello! Welcome to our interview today. Could you briefly introduce yourself and your strengths?</p>
+                </div>
+              </div>
+
+              <!-- Voice Recording & Text Control -->
+              <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <input type="text" id="input-voice-chat-text" placeholder="语音识别或在此输入您的回复..." style="flex: 1; padding: 0.75rem 1rem; border-radius: 14px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main); font-size: 0.95rem; outline: none; font-weight: 500;">
+                <button id="btn-voice-chat-mic" class="glow-btn-outline" style="padding: 0.75rem 1.1rem;" title="按住发音录音">
+                  <i class="fa-solid fa-microphone"></i>
+                </button>
+                <button id="btn-voice-chat-send" class="glow-btn" style="padding: 0.75rem 1.25rem;">发送</button>
+              </div>
+            </div>
+          </div>
+
           <!-- 1.5 Immersive Reader Panel -->
-          <div id="academy-reader-view" class="academy-sub-panel active">
+          <div id="academy-reader-view" class="academy-sub-panel">
             <div class="reader-container">
               <div class="reader-input-area" id="reader-input-area">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:600;"><i class="fa-solid fa-file-lines"></i> 粘贴长文或导入文档：</span>
+                  <label class="mini-btn" style="cursor: pointer; color: var(--accent-primary); border-color: var(--accent-primary);"><i class="fa-solid fa-file-circle-plus"></i> 导入 TXT/DOCX 文件 <input type="file" id="input-doc-file" accept=".txt,.docx,.md" style="display:none;"></label>
+                </div>
                 <textarea id="reader-paste-text" placeholder="在这里粘贴您的英文长篇文章、学术论文或真题阅读原文..."></textarea>
                 
                 <div id="reader-history-bookshelf" class="reader-history-bookshelf hidden" style="margin-top: 0.75rem; text-align: left;">
@@ -575,7 +636,39 @@
             </div>
           </div>
 
-          <div class="charts-row">
+          <!-- Gamification Badges Section -->
+          <div class="badges-card" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.25rem 1.5rem; margin-top: 1.25rem; box-shadow: var(--glass-shadow);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h5 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 0;"><i class="fa-solid fa-medal" style="color: var(--accent-primary);"></i> 我的学习成就勋章墙</h5>
+              <button id="btn-generate-poster" class="glow-btn" style="padding: 0.4rem 0.95rem; font-size: 0.8rem;">
+                <i class="fa-solid fa-share-nodes"></i> 生成朋友圈打卡海报
+              </button>
+            </div>
+            <div class="badges-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1rem;">
+              <div class="badge-item active" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.85rem; border-radius: 14px; text-align: center;">
+                <i class="fa-solid fa-seedling" style="font-size: 1.6rem; color: #10b981; margin-bottom: 0.35rem;"></i>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">初露锋芒</div>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">开启首日学习</span>
+              </div>
+              <div class="badge-item active" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.85rem; border-radius: 14px; text-align: center;">
+                <i class="fa-solid fa-book-bookmark" style="font-size: 1.6rem; color: #3b82f6; margin-bottom: 0.35rem;"></i>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">词霸攻坚</div>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">词汇突破 100 词</span>
+              </div>
+              <div class="badge-item active" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.85rem; border-radius: 14px; text-align: center;">
+                <i class="fa-solid fa-fire" style="font-size: 1.6rem; color: #ef4444; margin-bottom: 0.35rem;"></i>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">自律之火</div>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">连续打卡 7 天</span>
+              </div>
+              <div class="badge-item active" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.85rem; border-radius: 14px; text-align: center;">
+                <i class="fa-solid fa-award" style="font-size: 1.6rem; color: #f59e0b; margin-bottom: 0.35rem;"></i>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">四六级战神</div>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">完成真题刷题</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-row" style="margin-top: 1.25rem;">
             <div class="chart-card">
               <div class="chart-header">
                 <h5><i class="fa-solid fa-chart-line"></i> 7日翻译字数趋势</h5>
@@ -660,6 +753,33 @@
     </div>
   </div>
 
+  <!-- Poster Sharing Modal -->
+  <div id="poster-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 380px; text-align: center;">
+      <div class="modal-header">
+        <h4><i class="fa-solid fa-image"></i> 今日学习打卡海报</h4>
+        <button class="close-btn" id="btn-close-poster">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1rem;">
+        <div id="poster-preview-card" style="background: linear-gradient(135deg, #1e1b4b, #312e81); color: #fff; padding: 1.5rem; border-radius: 20px; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="font-weight: 800; font-size: 1.1rem; color: #a5b4fc;"><i class="fa-solid fa-wand-magic-sparkles"></i> AuraTranslate</span>
+            <span style="font-size: 0.75rem; background: rgba(255,255,255,0.15); padding: 0.2rem 0.5rem; border-radius: 8px;">极光英语</span>
+          </div>
+          <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;" id="poster-streak-num">7 DAYS</div>
+          <p style="font-size: 0.85rem; color: #c7d2fe; margin-bottom: 1.25rem;">自律坚持，终成不凡！今日已学习 <strong id="poster-today-count" style="color: #fff;">20</strong> 个英语单词。</p>
+          <div style="border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 0.75rem; font-size: 0.75rem; color: #a5b4fc; display: flex; justify-content: space-between; align-items: center;">
+            <span>长按保存图片或截图分享朋友圈</span>
+            <i class="fa-solid fa-qrcode" style="font-size: 1.5rem;"></i>
+          </div>
+        </div>
+        <div style="margin-top: 1rem;">
+          <button id="btn-download-poster-hint" class="glow-btn" style="width: 100%;">成功生成！截图即可分享朋友圈</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Custom Alert Toast Notifications -->
   <div id="toast-container" class="toast-container"></div>
 
@@ -668,6 +788,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Core Script -->
-  <script src="app.js?v=9.0"></script>
+  <script src="app.js?v=10.0"></script>
 </body>
 </html>
