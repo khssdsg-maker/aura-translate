@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Core Stylesheet -->
-  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="index.css?v=18.0">
 </head>
 <body>
   <!-- Ambient Background Glow Blobs -->
@@ -374,24 +374,27 @@
             <div id="vocab-card-container" class="hidden">
               <div class="flashcard-deck">
                 <div class="flashcard" id="study-flashcard">
-                  <div class="card-face card-front">
-                    <span class="card-hint">点击卡片查看翻面与释义</span>
-                    <button class="speaker-icon-btn" id="btn-card-speak-src" title="听发音">
-                      <i class="fa-solid fa-volume-high"></i>
-                    </button>
-                    <h3 id="card-front-word">Loading...</h3>
-                    <p id="card-front-pron" class="phonetic">/ /</p>
-                  </div>
-                  <div class="card-face card-back">
-                    <span class="card-hint">点击翻回正面</span>
-                    <p id="card-back-translation" class="translation">释义加载中...</p>
-                    <div class="card-back-actions">
-                      <button id="btn-mark-mastered" class="mini-btn glow-btn-success">
-                        <i class="fa-solid fa-check"></i> 标为已掌握
+                  <div id="flashcard-inner">
+                    <div class="card-face card-front">
+                      <span class="card-hint">点击卡片查看翻面与释义</span>
+                      <button class="speaker-icon-btn" id="btn-card-speak-src" title="听发音">
+                        <i class="fa-solid fa-volume-high"></i>
                       </button>
-                      <button id="btn-practice-pron" class="mini-btn glow-btn-outline">
-                        <i class="fa-solid fa-microphone"></i> 口语发音练习
-                      </button>
+                      <h3 id="card-front-word">Loading...</h3>
+                      <p id="card-front-pron" class="phonetic">/ /</p>
+                    </div>
+                    <div class="card-face card-back">
+                      <span class="card-hint">点击翻回正面</span>
+                      <p id="card-back-translation" class="translation">释义加载中...</p>
+                      <div class="card-back-actions">
+                        <button id="btn-mark-mastered" class="mini-btn glow-btn-success">
+                          <i class="fa-solid fa-check"></i> 标为已掌握
+                        </button>
+                        <button id="btn-practice-pron" class="mini-btn glow-btn-outline">
+                          <i class="fa-solid fa-microphone"></i> 口语发音练习
+                        </button>
+                      </div>
+                      <p id="card-back-time" class="card-time"></p>
                     </div>
                   </div>
                 </div>
@@ -401,6 +404,23 @@
                 <span class="deck-progress" id="deck-progress-text">1 / 1</span>
                 <button id="btn-next-card" class="glow-btn-outline">下一个 <i class="fa-solid fa-chevron-right"></i></button>
               </div>
+              <div id="card-review-bar" class="review-bar" style="display: flex; justify-content: center; gap: 0.75rem; margin-top: 1rem;">
+                <button class="review-btn" data-grade="1" style="padding: 0.4rem 0.8rem; border-radius: 8px; border: 1px solid #ef4444; background: rgba(239,68,68,0.1); color: #ef4444; font-weight: 700; cursor: pointer;">😣 忘记了</button>
+                <button class="review-btn" data-grade="3" style="padding: 0.4rem 0.8rem; border-radius: 8px; border: 1px solid #f59e0b; background: rgba(245,158,11,0.1); color: #f59e0b; font-weight: 700; cursor: pointer;">🤔 模糊</button>
+                <button class="review-btn" data-grade="5" style="padding: 0.4rem 0.8rem; border-radius: 8px; border: 1px solid #22c55e; background: rgba(34,197,94,0.1); color: #22c55e; font-weight: 700; cursor: pointer;">😊 记住了</button>
+              </div>
+            </div>
+            <div id="card-practice-panel" class="hidden" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; margin-top: 1rem;">
+              <h4 style="margin-bottom: 0.75rem; color: var(--text-main);"><i class="fa-solid fa-microphone"></i> 发音跟读练习</h4>
+              <p id="practice-target-sentence" style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.75rem; font-weight: 600;">Loading...</p>
+              <button id="btn-practice-mic" class="glow-btn" style="margin-bottom: 0.75rem;"><i class="fa-solid fa-microphone"></i> 开始录音</button>
+              <p id="practice-status-text" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;"></p>
+              <div id="practice-result-panel" class="hidden" style="text-align: center; padding: 1rem;">
+                <svg id="practice-score-ring" width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="35" fill="none" stroke="var(--glass-border)" stroke-width="5"/><circle cx="40" cy="40" r="35" fill="none" stroke="var(--accent-primary)" stroke-width="5" stroke-dasharray="220" stroke-dashoffset="220" stroke-linecap="round"/></svg>
+                <p id="practice-score-text" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-primary); margin: 0.5rem 0;">0%</p>
+                <p id="practice-feedback-text" style="font-size: 0.9rem; color: var(--text-muted);"></p>
+              </div>
+              <button id="btn-close-practice" class="text-link-btn" style="margin-top: 0.5rem;">关闭练习面板</button>
             </div>
           </div>
         </div>
@@ -489,6 +509,13 @@
                   <span class="reader-hint"><i class="fa-solid fa-mouse-pointer"></i> 选中文字可进行实时气泡翻译</span>
                 </div>
                 <div class="reader-article-content" id="reader-article-content"></div>
+                <div class="reader-vocab-sidebar" style="margin-top: 1rem;">
+                  <div id="reader-vocab-empty" class="empty-state" style="font-size: 0.85rem; color: var(--text-muted); text-align: center; padding: 1rem;">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <p>点击文中单词即可收录到侧边生词栏</p>
+                  </div>
+                  <ul id="reader-vocab-list" class="records-list" style="max-height: 300px; overflow-y: auto;"></ul>
+                </div>
               </div>
 
               <div id="reader-tooltip-bubble" class="reader-tooltip-bubble hidden">
@@ -537,6 +564,15 @@
                   <button class="target-btn active" id="btn-cet4-tab">CET-4</button>
                   <button class="target-btn" id="btn-cet6-tab">CET-6</button>
                 </div>
+              </div>
+              <div style="margin: 1rem 0;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <div style="flex: 1; height: 8px; border-radius: 4px; background: var(--glass-border); overflow: hidden;">
+                    <div id="cet-progress-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px; transition: width 0.5s;"></div>
+                  </div>
+                  <span id="cet-progress-val" style="font-size: 0.8rem; font-weight: 700; color: var(--accent-primary);">0%</span>
+                </div>
+                <div id="cet-calendar-grid" class="calendar-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem;"></div>
               </div>
 
               <div class="quiz-card-wrapper">
@@ -788,6 +824,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Core Script -->
-  <script src="app.js?v=11.0"></script>
+  <script src="app.js?v=19.0"></script>
 </body>
 </html>
