@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardReviewBar = document.getElementById('card-review-bar');
 
   // Reader Tab elements
+  const subtabVoiceChat = document.getElementById('subtab-voice-chat');
+  const academyVoiceChatView = document.getElementById('academy-voice-chat-view');
   const subtabReader = document.getElementById('subtab-reader');
   const academyReaderView = document.getElementById('academy-reader-view');
   const readerPasteText = document.getElementById('reader-paste-text');
@@ -578,7 +580,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       if (tabName === 'words') {
-        renderCurrentWordStudy();
+        switchSubtab('word-learning');
+      } else if (tabName === 'sentences') {
+        switchSubtab('voice-chat');
       } else if (tabName === 'dashboard') {
         renderHeatmap();
         setTimeout(() => {
@@ -809,6 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Reader events
+    if (subtabVoiceChat) subtabVoiceChat.addEventListener('click', () => switchSubtab('voice-chat'));
     if (subtabReader) subtabReader.addEventListener('click', () => switchSubtab('reader'));
     if (btnStartReading) btnStartReading.addEventListener('click', startImmersiveReader);
     if (btnBackToPaste) btnBackToPaste.addEventListener('click', stopImmersiveReader);
@@ -1671,48 +1676,60 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- ========================================================== ---
 
   function switchSubtab(subtab) {
+    console.log("switchSubtab called with subtab:", subtab);
     state.activeSubtab = subtab;
     
-    subtabVocab.classList.remove('active');
-    subtabQuotes.classList.remove('active');
-    subtabCet.classList.remove('active');
-    
-    academyVocabView.classList.remove('active');
-    academyQuotesView.classList.remove('active');
-    academyCetView.classList.remove('active');
-    
+    // Remove active class from all subtab buttons
+    if (subtabVocab) subtabVocab.classList.remove('active');
+    if (subtabQuotes) subtabQuotes.classList.remove('active');
+    if (subtabCet) subtabCet.classList.remove('active');
     if (subtabWordLearning) subtabWordLearning.classList.remove('active');
+    if (subtabReader) subtabReader.classList.remove('active');
+    if (subtabVoiceChat) subtabVoiceChat.classList.remove('active');
+    if (subtabDashboard) subtabDashboard.classList.remove('active');
+    
+    // Remove active class from all academy subpanel views
+    if (academyVocabView) academyVocabView.classList.remove('active');
+    if (academyQuotesView) academyQuotesView.classList.remove('active');
+    if (academyCetView) academyCetView.classList.remove('active');
     if (academyWordLearningView) academyWordLearningView.classList.remove('active');
-    subtabReader.classList.remove('active');
-    subtabDashboard.classList.remove('active');
-    academyReaderView.classList.remove('active');
-    academyDashboardView.classList.remove('active');
+    if (academyReaderView) academyReaderView.classList.remove('active');
+    if (academyVoiceChatView) academyVoiceChatView.classList.remove('active');
+    if (academyDashboardView) academyDashboardView.classList.remove('active');
 
-    if (subtab === 'word-learning') {
+    // Activate the selected subtab and subpanel
+    if (subtab === 'voice-chat') {
+      if (subtabVoiceChat) subtabVoiceChat.classList.add('active');
+      if (academyVoiceChatView) academyVoiceChatView.classList.add('active');
+    } else if (subtab === 'word-learning') {
       if (subtabWordLearning) subtabWordLearning.classList.add('active');
       if (academyWordLearningView) academyWordLearningView.classList.add('active');
       renderCurrentWordStudy();
     } else if (subtab === 'vocab') {
-      subtabVocab.classList.add('active');
-      academyVocabView.classList.add('active');
+      if (subtabVocab) subtabVocab.classList.add('active');
+      if (academyVocabView) academyVocabView.classList.add('active');
+      renderVocabList();
     } else if (subtab === 'reader') {
-      subtabReader.classList.add('active');
-      academyReaderView.classList.add('active');
-      stopImmersiveReader(); // Reset reader canvas state on select
+      if (subtabReader) subtabReader.classList.add('active');
+      if (academyReaderView) academyReaderView.classList.add('active');
+      stopImmersiveReader();
       renderReaderHistoryShelf();
     } else if (subtab === 'quotes') {
-      subtabQuotes.classList.add('active');
-      academyQuotesView.classList.add('active');
+      if (subtabQuotes) subtabQuotes.classList.add('active');
+      if (academyQuotesView) academyQuotesView.classList.add('active');
+      renderDailyQuote();
     } else if (subtab === 'cet') {
-      subtabCet.classList.add('active');
-      academyCetView.classList.add('active');
+      if (subtabCet) subtabCet.classList.add('active');
+      if (academyCetView) academyCetView.classList.add('active');
+      loadCETPlan();
+      loadQuizQuestion();
     } else if (subtab === 'dashboard') {
-      subtabDashboard.classList.add('active');
-      academyDashboardView.classList.add('active');
-      renderDashboardCharts();
+      if (subtabDashboard) subtabDashboard.classList.add('active');
+      if (academyDashboardView) academyDashboardView.classList.add('active');
+      renderHeatmap();
     }
     
-    updateTabsUI(); // Sync the Clear button status
+    updateTabsUI();
   }
 
   // --- 1. Vocabulary & Flashcard logic ---
