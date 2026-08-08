@@ -3081,7 +3081,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return state.wordCoursesDatabase[book];
     }
     try {
-      const res = await fetch(`words_${book}.json`);
+      const res = await fetch(`./words_${book}.json?v=20.0`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       state.wordCoursesDatabase[book] = data;
