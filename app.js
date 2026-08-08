@@ -548,12 +548,14 @@ document.addEventListener('DOMContentLoaded', () => {
     state.activeMainTab = tabName;
 
     try {
-      // Update sidebar nav buttons active state
+      // Update sidebar nav buttons active state & clear focus
       document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
-        if (btn && btn.dataset && btn.dataset.tab === tabName) {
-          btn.classList.add('active');
-        } else if (btn) {
-          btn.classList.remove('active');
+        const targetBtn = btn.closest('.sidebar-nav-btn') || btn;
+        if (targetBtn && targetBtn.dataset && targetBtn.dataset.tab === tabName) {
+          targetBtn.classList.add('active');
+        } else if (targetBtn) {
+          targetBtn.classList.remove('active');
+          if (typeof targetBtn.blur === 'function') targetBtn.blur();
         }
       });
     } catch (e) { console.error("Sidebar nav update error:", e); }
@@ -1691,6 +1693,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function switchSubtab(subtab) {
     console.log("switchSubtab called with subtab:", subtab);
     state.activeSubtab = subtab;
+
+    // Automatically sync parent main section sidebar button
+    const subtabToSectionMap = {
+      'word-learning': 'words',
+      'vocab': 'words',
+      'voice-chat': 'sentences',
+      'reader': 'sentences',
+      'quotes': 'sentences',
+      'cet': 'sentences',
+      'dashboard': 'dashboard'
+    };
+
+    const parentSection = subtabToSectionMap[subtab];
+    if (parentSection) {
+      document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
+        const targetBtn = btn.closest('.sidebar-nav-btn') || btn;
+        if (targetBtn && targetBtn.dataset && targetBtn.dataset.tab === parentSection) {
+          targetBtn.classList.add('active');
+        } else if (targetBtn) {
+          targetBtn.classList.remove('active');
+          if (typeof targetBtn.blur === 'function') targetBtn.blur();
+        }
+      });
+    }
     
     // Remove active class from all subtab buttons
     const allButtons = [subtabVocab, subtabQuotes, subtabCet, subtabWordLearning, subtabReader, subtabVoiceChat, subtabDashboard];
