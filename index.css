@@ -9,18 +9,21 @@
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Light Theme variables (Default) */
-  --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  --glow-color-1: rgba(138, 92, 246, 0.15); /* Purple */
-  --glow-color-2: rgba(59, 130, 246, 0.15);  /* Blue */
-  --glow-color-3: rgba(236, 72, 153, 0.1);  /* Pink */
+  /* Light Theme variables (Default) - Multi-layer Stratification */
+  --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  --glow-color-1: rgba(124, 58, 237, 0.18); /* Purple */
+  --glow-color-2: rgba(37, 99, 235, 0.15);  /* Blue */
+  --glow-color-3: rgba(236, 72, 153, 0.12);  /* Pink */
   
-  --glass-bg: rgba(255, 255, 255, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+  /* Layer 1: Main Container Shell */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(124, 58, 237, 0.18);
+  --glass-shadow: 0 16px 40px -12px rgba(124, 58, 237, 0.12);
   
-  --card-bg: rgba(255, 255, 255, 0.65);
-  --card-border: rgba(255, 255, 255, 0.5);
+  /* Layer 2: Functional Cards */
+  --card-bg: rgba(255, 255, 255, 0.92);
+  --card-border: rgba(124, 58, 237, 0.12);
+  --card-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.05);
   
   --input-bg: rgba(255, 255, 255, 0.5);
   --input-border: rgba(138, 92, 246, 0.15);
@@ -49,12 +52,15 @@
   --glow-color-2: rgba(59, 130, 246, 0.2);
   --glow-color-3: rgba(236, 72, 153, 0.15);
   
-  --glass-bg: rgba(15, 23, 42, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  /* Layer 1: Main Container Shell */
+  --glass-bg: rgba(15, 23, 42, 0.82);
+  --glass-border: rgba(167, 139, 250, 0.2);
+  --glass-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.5);
   
-  --card-bg: rgba(30, 41, 59, 0.45);
-  --card-border: rgba(255, 255, 255, 0.05);
+  /* Layer 2: Functional Cards */
+  --card-bg: rgba(30, 41, 59, 0.85);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.3);
   
   --input-bg: rgba(15, 23, 42, 0.6);
   --input-border: rgba(255, 255, 255, 0.08);
