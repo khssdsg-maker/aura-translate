@@ -39,6 +39,86 @@
       "trans": "保证，担保",
       "exampleEn": "Hard work alone cannot guarantee success, but it helps.",
       "exampleZh": "单凭努力不能保证成功，但很有帮助。"
+    },
+    {
+      "word": "hesitate",
+      "pron": "/ˈhezɪteɪt/",
+      "pos": "v.",
+      "trans": "犹豫，迟疑",
+      "exampleEn": "Do not hesitate to contact us if you need help.",
+      "exampleZh": "如果您需要帮助，请随时联系我们。"
+    },
+    {
+      "word": "illustrate",
+      "pron": "/ˈɪləstreɪt/",
+      "pos": "v.",
+      "trans": "说明，阐明，加插图",
+      "exampleEn": "The teacher used examples to illustrate the point.",
+      "exampleZh": "老师用例子来说明这一点。"
+    },
+    {
+      "word": "maintain",
+      "pron": "/meɪnˈteɪn/",
+      "pos": "v.",
+      "trans": "维持，保持，维修",
+      "exampleEn": "It is important to maintain a healthy lifestyle.",
+      "exampleZh": "保持健康的生活方式非常重要。"
+    },
+    {
+      "word": "obvious",
+      "pron": "/ˈɒbviəs/",
+      "pos": "adj.",
+      "trans": "明显的，显而易见的",
+      "exampleEn": "It is obvious that she has practiced a lot.",
+      "exampleZh": "很明显，她练习了很久。"
+    },
+    {
+      "word": "persistent",
+      "pron": "/pəˈsɪstənt/",
+      "pos": "adj.",
+      "trans": "坚持不懈的，执着的",
+      "exampleEn": "Her persistent efforts yielded great results.",
+      "exampleZh": "她坚持不懈的努力取得了巨大成果。"
+    },
+    {
+      "word": "reluctant",
+      "pron": "/rɪˈlʌktənt/",
+      "pos": "adj.",
+      "trans": "不情愿的，勉强的",
+      "exampleEn": "He was reluctant to leave his hometown.",
+      "exampleZh": "他不情愿离开他的家乡。"
+    },
+    {
+      "word": "sufficient",
+      "pron": "/səˈfɪʃnt/",
+      "pos": "adj.",
+      "trans": "充足的，足够的",
+      "exampleEn": "We have sufficient evidence to support our claim.",
+      "exampleZh": "我们有足够的证据支持我们的主张。"
+    },
+    {
+      "word": "temporary",
+      "pron": "/ˈtemprəri/",
+      "pos": "adj.",
+      "trans": "暂时的，临时的",
+      "exampleEn": "This is only a temporary solution to the problem.",
+      "exampleZh": "这只是问题的临时解决方法。"
+    },
+    {
+      "word": "ultimate",
+      "pron": "/ˈʌltɪmət/",
+      "pos": "adj.",
+      "trans": "最终的，终极的",
+      "exampleEn": "Our ultimate goal is to achieve peace.",
+      "exampleZh": "我们的最终目标是实现和平。"
+    },
+    {
+      "word": "vulnerable",
+      "pron": "/ˈvʌlnərəbl/",
+      "pos": "adj.",
+      "trans": "易受伤害的，脆弱的",
+      "exampleEn": "Children are particularly vulnerable to diseases.",
+      "exampleZh": "儿童特别容易受到疾病的侵袭。"
     }
   ],
   "cet6": [
@@ -65,6 +145,62 @@
       "trans": "微妙的，细微的",
       "exampleEn": "There is a subtle difference between the two terms.",
       "exampleZh": "这两个术语之间存在细微的区别。"
+    },
+    {
+      "word": "deteriorate",
+      "pron": "/dɪˈtɪəriəreɪt/",
+      "pos": "v.",
+      "trans": "恶化，变坏",
+      "exampleEn": "The weather conditions began to deteriorate rapidly.",
+      "exampleZh": "天气状况开始迅速恶化。"
+    },
+    {
+      "word": "empirical",
+      "pron": "/ɪmˈpɪrɪkl/",
+      "pos": "adj.",
+      "trans": "以经验为依据的，实证的",
+      "exampleEn": "The theory is based on empirical data collected over years.",
+      "exampleZh": "该理论基于多年收集的实证数据。"
+    },
+    {
+      "word": "incompatible",
+      "pron": "/ˌɪnkəmˈpætəbl/",
+      "pos": "adj.",
+      "trans": "不兼容的，互不协调的",
+      "exampleEn": "Their working styles were completely incompatible.",
+      "exampleZh": "他们的工作风格完全不兼容。"
+    },
+    {
+      "word": "jeopardize",
+      "pron": "/ˈdʒepədaɪz/",
+      "pos": "v.",
+      "trans": "危害，危及",
+      "exampleEn": "Careless mistakes could jeopardize the whole project.",
+      "exampleZh": "粗心的错误可能会危及整个项目。"
+    },
+    {
+      "word": "lucrative",
+      "pron": "/ˈluːkrətɪv/",
+      "pos": "adj.",
+      "trans": "获利丰厚的，赚钱的",
+      "exampleEn": "He left his teaching job for a lucrative career in business.",
+      "exampleZh": "他辞去了教职，转而从事获利丰厚的商业事业。"
+    },
+    {
+      "word": "meticulous",
+      "pron": "/məˈtɪkjələs/",
+      "pos": "adj.",
+      "trans": "一丝不苟的，缜密的",
+      "exampleEn": "She performed her research with meticulous attention to detail.",
+      "exampleZh": "她以对细节的极高关注开展研究。"
+    },
+    {
+      "word": "precedent",
+      "pron": "/ˈpresɪdənt/",
+      "pos": "n.",
+      "trans": "先例，前例",
+      "exampleEn": "This court ruling sets an important precedent.",
+      "exampleZh": "这一法庭裁决树立了一个重要的先例。"
     }
   ],
   "kaoyan": [
@@ -83,6 +219,30 @@
       "trans": "流行的，普遍的",
       "exampleEn": "Online shopping has become prevalent worldwide.",
       "exampleZh": "网上购物在全球范围内已变得非常普遍。"
+    },
+    {
+      "word": "coincide",
+      "pron": "/ˌkəʊɪnˈsaɪd/",
+      "pos": "v.",
+      "trans": "巧合，同时发生，一致",
+      "exampleEn": "Her holiday coincided with the national festival.",
+      "exampleZh": "她的假期正好赶上了国家节日。"
+    },
+    {
+      "word": "detrimental",
+      "pron": "/ˌdetrɪˈmentl/",
+      "pos": "adj.",
+      "trans": "有害的，不利的",
+      "exampleEn": "Smoking has a detrimental effect on human health.",
+      "exampleZh": "吸烟对人类健康有危害作用。"
+    },
+    {
+      "word": "intrinsic",
+      "pron": "/ɪnˈtrɪnzɪk/",
+      "pos": "adj.",
+      "trans": "固有的，内在的",
+      "exampleEn": "Flexibility is an intrinsic quality of rubber.",
+      "exampleZh": "弹性是橡胶的固质特性。"
     }
   ],
   "ielts": [
@@ -101,6 +261,30 @@
       "trans": "大量的，实质性的",
       "exampleEn": "The company reported a substantial increase in profits.",
       "exampleZh": "该公司报告利润大幅增加。"
+    },
+    {
+      "word": "allocate",
+      "pron": "/ˈæləkeɪt/",
+      "pos": "v.",
+      "trans": "分配，拨出",
+      "exampleEn": "The council decided to allocate resources to public health.",
+      "exampleZh": "议会决定将资源分配给公共卫生领域。"
+    },
+    {
+      "word": "cohesive",
+      "pron": "/kəʊˈhiːsɪv/",
+      "pos": "adj.",
+      "trans": "有凝聚力的，紧密结合的",
+      "exampleEn": "A cohesive team works effectively together.",
+      "exampleZh": "一支有凝聚力的团队可以高效合作。"
+    },
+    {
+      "word": "predominant",
+      "pron": "/prɪˈdɒmɪnənt/",
+      "pos": "adj.",
+      "trans": "占主导地位的，显著的",
+      "exampleEn": "English is the predominant language in international commerce.",
+      "exampleZh": "英语是国际商业占主导地位的语言。"
     }
   ]
 }
