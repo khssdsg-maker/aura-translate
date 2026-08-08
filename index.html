@@ -312,15 +312,6 @@
 
                     <h2 id="study-word-title" style="font-family: var(--font-title); font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Word</h2>
                     <div id="study-word-pron" style="font-size: 1rem; color: var(--accent-secondary); margin-bottom: 0.85rem;">/pron/</div>
-
-                    <!-- AI Visual Illustration Image -->
-                    <div class="word-img-container" style="position: relative; width: 100%; height: 180px; border-radius: 16px; overflow: hidden; margin-bottom: 1rem; background: var(--input-bg); border: 1px solid var(--glass-border); display: flex; justify-content: center; align-items: center;">
-                      <img id="study-word-img" src="" alt="单词视觉插图" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px; transition: transform var(--transition-normal); opacity: 0;" onload="this.style.opacity=1; document.getElementById('study-word-img-loader').classList.add('hidden');" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=400&q=80';">
-                      <div id="study-word-img-loader" style="position: absolute; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.75rem;">
-                        <div class="spinner" style="width:20px; height:20px;"></div>
-                        <span>生成中...</span>
-                      </div>
-                    </div>
                     
                     <div id="study-word-trans-box" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 1rem; display: inline-block; width: 100%;">
                       <span id="study-word-pos" style="font-weight: 800; color: var(--accent-primary); margin-right: 0.5rem;">v.</span>
@@ -713,6 +704,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Core Script -->
-  <script src="app.js?v=7.0"></script>
+  <script src="app.js?v=8.0"></script>
 </body>
 </html>
