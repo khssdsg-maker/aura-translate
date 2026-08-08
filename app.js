@@ -1693,52 +1693,78 @@ document.addEventListener('DOMContentLoaded', () => {
     state.activeSubtab = subtab;
     
     // Remove active class from all subtab buttons
-    if (subtabVocab) subtabVocab.classList.remove('active');
-    if (subtabQuotes) subtabQuotes.classList.remove('active');
-    if (subtabCet) subtabCet.classList.remove('active');
-    if (subtabWordLearning) subtabWordLearning.classList.remove('active');
-    if (subtabReader) subtabReader.classList.remove('active');
-    if (subtabVoiceChat) subtabVoiceChat.classList.remove('active');
-    if (subtabDashboard) subtabDashboard.classList.remove('active');
+    const allButtons = [subtabVocab, subtabQuotes, subtabCet, subtabWordLearning, subtabReader, subtabVoiceChat, subtabDashboard];
+    allButtons.forEach(btn => {
+      if (btn) btn.classList.remove('active');
+    });
     
-    // Remove active class from all academy subpanel views
-    if (academyVocabView) academyVocabView.classList.remove('active');
-    if (academyQuotesView) academyQuotesView.classList.remove('active');
-    if (academyCetView) academyCetView.classList.remove('active');
-    if (academyWordLearningView) academyWordLearningView.classList.remove('active');
-    if (academyReaderView) academyReaderView.classList.remove('active');
-    if (academyVoiceChatView) academyVoiceChatView.classList.remove('active');
-    if (academyDashboardView) academyDashboardView.classList.remove('active');
+    // Explicitly hide all academy subpanel views with inline display: none !important
+    const allPanels = [
+      academyVocabView,
+      academyQuotesView,
+      academyCetView,
+      academyWordLearningView,
+      academyReaderView,
+      academyVoiceChatView,
+      academyDashboardView
+    ];
+    allPanels.forEach(panel => {
+      if (panel) {
+        panel.classList.remove('active');
+        panel.style.setProperty('display', 'none', 'important');
+      }
+    });
 
-    // Activate the selected subtab and subpanel
+    // Activate the selected subtab and subpanel with inline display: block !important
     if (subtab === 'voice-chat') {
       if (subtabVoiceChat) subtabVoiceChat.classList.add('active');
-      if (academyVoiceChatView) academyVoiceChatView.classList.add('active');
+      if (academyVoiceChatView) {
+        academyVoiceChatView.classList.add('active');
+        academyVoiceChatView.style.setProperty('display', 'block', 'important');
+      }
     } else if (subtab === 'word-learning') {
       if (subtabWordLearning) subtabWordLearning.classList.add('active');
-      if (academyWordLearningView) academyWordLearningView.classList.add('active');
+      if (academyWordLearningView) {
+        academyWordLearningView.classList.add('active');
+        academyWordLearningView.style.setProperty('display', 'block', 'important');
+      }
       renderCurrentWordStudy();
     } else if (subtab === 'vocab') {
       if (subtabVocab) subtabVocab.classList.add('active');
-      if (academyVocabView) academyVocabView.classList.add('active');
+      if (academyVocabView) {
+        academyVocabView.classList.add('active');
+        academyVocabView.style.setProperty('display', 'block', 'important');
+      }
       renderVocabList();
     } else if (subtab === 'reader') {
       if (subtabReader) subtabReader.classList.add('active');
-      if (academyReaderView) academyReaderView.classList.add('active');
+      if (academyReaderView) {
+        academyReaderView.classList.add('active');
+        academyReaderView.style.setProperty('display', 'block', 'important');
+      }
       stopImmersiveReader();
       renderReaderHistoryShelf();
     } else if (subtab === 'quotes') {
       if (subtabQuotes) subtabQuotes.classList.add('active');
-      if (academyQuotesView) academyQuotesView.classList.add('active');
+      if (academyQuotesView) {
+        academyQuotesView.classList.add('active');
+        academyQuotesView.style.setProperty('display', 'block', 'important');
+      }
       renderDailyQuote();
     } else if (subtab === 'cet') {
       if (subtabCet) subtabCet.classList.add('active');
-      if (academyCetView) academyCetView.classList.add('active');
+      if (academyCetView) {
+        academyCetView.classList.add('active');
+        academyCetView.style.setProperty('display', 'block', 'important');
+      }
       loadCETPlan();
       loadQuizQuestion();
     } else if (subtab === 'dashboard') {
       if (subtabDashboard) subtabDashboard.classList.add('active');
-      if (academyDashboardView) academyDashboardView.classList.add('active');
+      if (academyDashboardView) {
+        academyDashboardView.classList.add('active');
+        academyDashboardView.style.setProperty('display', 'block', 'important');
+      }
       renderHeatmap();
     }
     
