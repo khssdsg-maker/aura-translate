@@ -1992,89 +1992,107 @@ document.addEventListener('DOMContentLoaded', () => {
   let practiceRecognition = null;
   let targetPracticeText = "";
 
+  function initPracticeRecognition() {
+    if (!SpeechRecognition) return null;
+    if (practiceRecognition) return practiceRecognition;
+
+    try {
+      practiceRecognition = new SpeechRecognition();
+      practiceRecognition.continuous = false;
+      practiceRecognition.interimResults = false;
+      practiceRecognition.lang = 'en-US';
+
+      practiceRecognition.onstart = () => {
+        if (btnPracticeMic) btnPracticeMic.classList.add('recording');
+        if (practiceStatusText) practiceStatusText.textContent = '正在聆听您的发音，请说话...';
+      };
+
+      practiceRecognition.onresult = (event) => {
+        const spokenText = event.results && event.results[0] && event.results[0][0] ? event.results[0][0].transcript : '';
+        if (spokenText) {
+          evaluatePronunciation(spokenText);
+        }
+      };
+
+      practiceRecognition.onerror = (event) => {
+        console.error("practiceRecognition error:", event.error);
+        if (practiceStatusText) practiceStatusText.textContent = '语音识别结束或未听到声音，点击重新跟读';
+        if (btnPracticeMic) btnPracticeMic.classList.remove('recording');
+      };
+
+      practiceRecognition.onend = () => {
+        if (btnPracticeMic) btnPracticeMic.classList.remove('recording');
+      };
+    } catch (err) {
+      console.error("Failed to create practiceRecognition:", err);
+      practiceRecognition = null;
+    }
+    return practiceRecognition;
+  }
+
   function openPronunciationPractice(sentenceText = "") {
     if (!SpeechRecognition) {
       showToast('当前浏览器不支持语音评测功能 (SpeechRecognition)', 'error');
       return;
     }
-    
-    // If no custom text passed, fetch text from current flashcard
-    if (typeof sentenceText !== 'string' || !sentenceText.trim()) {
-      if (state.vocabulary.length === 0) return;
+
+    initPracticeRecognition();
+
+    if (typeof sentenceText === 'string' && sentenceText.trim()) {
+      targetPracticeText = sentenceText.trim();
+    } else if (cardFrontWord && cardFrontWord.textContent && cardFrontWord.textContent !== 'Loading...') {
+      targetPracticeText = cardFrontWord.textContent.trim();
+    } else if (state.vocabulary && state.vocabulary.length > 0 && state.vocabulary[state.activeCardIndex]) {
       targetPracticeText = state.vocabulary[state.activeCardIndex].word;
     } else {
-      targetPracticeText = sentenceText;
+      targetPracticeText = "Opportunity favors the prepared mind.";
     }
-    
-    practiceTargetSentence.textContent = targetPracticeText;
-    practiceStatusText.textContent = '点击麦克风开始跟读...';
-    practiceResultPanel.classList.add('hidden');
-    
-    // Reset ring animation
-    practiceScoreRing.setAttribute('stroke-dasharray', '0, 100');
-    practiceScoreText.textContent = "0%";
-    
-    cardPracticePanel.classList.remove('hidden');
-    
-    // Initialize specific practice recognition
-    if (!practiceRecognition) {
-      practiceRecognition = new SpeechRecognition();
-      practiceRecognition.continuous = false;
-      practiceRecognition.interimResults = false;
-      practiceRecognition.lang = 'en-US'; // Practice English
-      
-      practiceRecognition.onstart = () => {
-        btnPracticeMic.classList.add('recording');
-        practiceStatusText.textContent = '正在聆听您的发音，请说话...';
-      };
-      
-      practiceRecognition.onresult = (event) => {
-        const spokenText = event.results[0][0].transcript;
-        if (spokenText) {
-          evaluatePronunciation(spokenText);
-        }
-      };
-      
-      practiceRecognition.onerror = (event) => {
-        console.error(event.error);
-        practiceStatusText.textContent = '语音输入遇到问题，请重新开始';
-        btnPracticeMic.classList.remove('recording');
-      };
-      
-      practiceRecognition.onend = () => {
-        btnPracticeMic.classList.remove('recording');
-      };
-    }
+
+    if (practiceTargetSentence) practiceTargetSentence.textContent = targetPracticeText;
+    if (practiceStatusText) practiceStatusText.textContent = '点击麦克风开始跟读...';
+    if (practiceResultPanel) practiceResultPanel.classList.add('hidden');
+
+    if (practiceScoreRing) practiceScoreRing.setAttribute('stroke-dasharray', '0, 100');
+    if (practiceScoreText) practiceScoreText.textContent = "0%";
+
+    if (cardPracticePanel) cardPracticePanel.classList.remove('hidden');
   }
 
   function closePronunciationPractice() {
     if (practiceRecognition) {
-      practiceRecognition.stop();
+      try { practiceRecognition.stop(); } catch(e){}
     }
-    cardPracticePanel.classList.add('hidden');
+    if (cardPracticePanel) cardPracticePanel.classList.add('hidden');
   }
 
   function togglePracticeRecording() {
-    if (!practiceRecognition) return;
-    
-    // Stop main translator voice recording if active
-    if (state.isRecording) {
-      stopSpeechRecognition();
+    if (!SpeechRecognition) {
+      showToast('当前浏览器不支持语音识别！', 'error');
+      return;
     }
-    
+
+    const rec = initPracticeRecognition();
+    if (!rec) {
+      showToast('麦克风组件初始化失败', 'error');
+      return;
+    }
+
     // Stop active TTS
-    window.speechSynthesis.cancel();
-    
-    // If already running
-    if (btnPracticeMic.classList.contains('recording')) {
-      practiceRecognition.stop();
+    try { window.speechSynthesis.cancel(); } catch(e){}
+
+    if (btnPracticeMic && btnPracticeMic.classList.contains('recording')) {
+      try { rec.stop(); } catch (e) {}
+      btnPracticeMic.classList.remove('recording');
     } else {
       try {
-        practiceResultPanel.classList.add('hidden');
-        practiceRecognition.start();
+        if (practiceResultPanel) practiceResultPanel.classList.add('hidden');
+        rec.start();
       } catch (e) {
-        console.error(e);
-        showToast('麦克风启动失败', 'error');
+        console.warn("practiceRecognition start warning:", e);
+        try { rec.stop(); } catch(err){}
+        setTimeout(() => {
+          try { rec.start(); } catch(err2) { showToast('麦克风启动失败，请重试', 'error'); }
+        }, 200);
       }
     }
   }
