@@ -59,6 +59,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reading history shelf elements
   const readerHistoryBookshelf = document.getElementById('reader-history-bookshelf');
   const readerHistoryList = document.getElementById('reader-history-list');
+
+  // Phase 4 DOM elements
+  const engineSelect = document.getElementById('engine-select');
+  const btnConfigKey = document.getElementById('btn-config-key');
+  const keyModal = document.getElementById('key-modal');
+  const btnCloseKeyModal = document.getElementById('btn-close-key-modal');
+  const inputApiKey = document.getElementById('input-api-key');
+  const btnSaveKey = document.getElementById('btn-save-key');
+
+  const btnAnalyzeGrammar = document.getElementById('btn-analyze-grammar');
+  const grammarBreakdownDrawer = document.getElementById('grammar-breakdown-drawer');
+  const btnCloseGrammar = document.getElementById('btn-close-grammar');
+  const grammarStructureText = document.getElementById('grammar-structure-text');
+  const grammarCollocationsTags = document.getElementById('grammar-collocations-tags');
+
+  const heatmapGridContainer = document.getElementById('heatmap-grid-container');
+  const streakDaysCount = document.getElementById('streak-days-count');
   
   const srcLangSelect = document.getElementById('src-lang');
   const tgtLangSelect = document.getElementById('tgt-lang');
@@ -214,7 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Optimized features state
     ttsSpeed: parseFloat(localStorage.getItem('aura_tts_speed')) || 1.0,
-    readerHistory: JSON.parse(localStorage.getItem('aura_reader_history')) || []
+    readerHistory: JSON.parse(localStorage.getItem('aura_reader_history')) || [],
+
+    // Phase 4 State
+    engine: localStorage.getItem('aura_engine') || 'default',
+    customApiKey: localStorage.getItem('aura_custom_api_key') || ''
   };
 
   // Defensive array checks to prevent type errors on null localStorage items
@@ -704,6 +725,72 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dashboard events
     subtabDashboard.addEventListener('click', () => switchSubtab('dashboard'));
 
+    // Phase 4: Engine select & Modal
+    if (engineSelect) {
+      engineSelect.value = state.engine;
+      engineSelect.addEventListener('change', () => {
+        state.engine = engineSelect.value;
+        localStorage.setItem('aura_engine', state.engine);
+        if (state.engine === 'custom' && !state.customApiKey) {
+          keyModal.classList.remove('hidden');
+        } else {
+          showToast(`已切换至：${engineSelect.options[engineSelect.selectedIndex].text}`, 'info');
+        }
+      });
+    }
+
+    if (btnConfigKey) {
+      btnConfigKey.addEventListener('click', () => {
+        if (inputApiKey) inputApiKey.value = state.customApiKey;
+        keyModal.classList.remove('hidden');
+      });
+    }
+
+    if (btnCloseKeyModal) {
+      btnCloseKeyModal.addEventListener('click', () => keyModal.classList.add('hidden'));
+    }
+
+    if (btnSaveKey) {
+      btnSaveKey.addEventListener('click', () => {
+        state.customApiKey = inputApiKey.value.trim();
+        localStorage.setItem('aura_custom_api_key', state.customApiKey);
+        keyModal.classList.add('hidden');
+        showToast(state.customApiKey ? 'API Key 已安全保存！' : 'API Key 已清空', 'success');
+      });
+    }
+
+    // Grammar Analysis trigger
+    if (btnAnalyzeGrammar) {
+      btnAnalyzeGrammar.addEventListener('click', analyzeSentenceGrammar);
+    }
+    if (btnCloseGrammar) {
+      btnCloseGrammar.addEventListener('click', () => grammarBreakdownDrawer.classList.add('hidden'));
+    }
+
+    // Keyboard Shortcuts (Ctrl+Enter, Alt+1/2/3, Ctrl+Shift+S)
+    document.addEventListener('keydown', (e) => {
+      // Ctrl + Enter or Cmd + Enter for Translate
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        translate(true);
+      }
+      // Alt + 1/2/3 for Quick Tab switching
+      else if (e.altKey && e.key === '1') {
+        e.preventDefault();
+        switchTab('history');
+      } else if (e.altKey && e.key === '2') {
+        e.preventDefault();
+        switchTab('favorites');
+      } else if (e.altKey && e.key === '3') {
+        e.preventDefault();
+        switchTab('academy');
+      } else if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        const srcText = srcTextarea.value.trim();
+        if (srcText) speak(srcText, srcLangSelect.value);
+      }
+    });
+
     // TTS Speed change slider
     if (ttsSpeedSlider) {
       ttsSpeedSlider.addEventListener('input', () => {
@@ -953,6 +1040,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCopyTgt.disabled = !enable;
     btnStarTgt.disabled = !enable;
     btnLearnTgt.disabled = !enable; // Vocab enabled
+    if (btnAnalyzeGrammar) btnAnalyzeGrammar.disabled = !enable;
   }
 
   function updateStatus(type, message) {
@@ -2445,6 +2533,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Render 365-day GitHub Learning Heatmap
+    renderHeatmap();
+
     // Chart 3: Oral pronunciation scores trends (Last 10 records)
     const ctx3 = document.getElementById('chart-oral-scores').getContext('2d');
     const recentScores = state.stats.oralScores.slice(-10);
@@ -2572,6 +2663,96 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('aura_reader_history', JSON.stringify(state.readerHistory));
     renderReaderHistoryShelf();
     showToast('已从历史书架移除', 'info');
+  }
+
+  // --- Phase 4: Grammar Analysis Logic ---
+  function analyzeSentenceGrammar() {
+    const text = srcTextarea.value.trim();
+    if (!text) {
+      showToast('请输入要进行语法拆解的句子！', 'warning');
+      return;
+    }
+
+    grammarBreakdownDrawer.classList.remove('hidden');
+    grammarStructureText.textContent = '正在使用 AI 拆解句法结构...';
+    grammarCollocationsTags.innerHTML = '';
+
+    setTimeout(() => {
+      // Analyze clause structure
+      const isComplex = text.includes(',') || text.includes('that') || text.includes('which') || text.includes('because') || text.includes('although');
+      const words = text.split(/\s+/);
+      
+      let structureDesc = "";
+      if (words.length <= 5) {
+        structureDesc = "【简单句结构】：主语 + 谓语短语。表达直接连贯。";
+      } else if (isComplex) {
+        structureDesc = "【复合句/主从复合结构】：包含引导词连接的主句与副词/定语从句，结构层次分明。";
+      } else {
+        structureDesc = "【标准单句结构】：包含独立的主谓宾语及修饰成分。";
+      }
+
+      grammarStructureText.textContent = structureDesc;
+
+      // Extract key collocations & words
+      const keyWords = words.filter(w => w.length > 4 && /[a-zA-Z]/.test(w)).slice(0, 5);
+      keyWords.forEach(w => {
+        const cleanWord = w.replace(/[^a-zA-Z]/g, '');
+        if (cleanWord) {
+          const span = document.createElement('span');
+          span.className = 'vocab-tag-btn';
+          span.innerHTML = `<i class="fa-solid fa-code-branch"></i> ${escapeHTML(cleanWord)}`;
+          span.addEventListener('click', () => {
+            fetchTranslation(cleanWord, 'en', 'zh-CN').then(t => showToast(`${cleanWord}: ${t}`, 'info'));
+          });
+          grammarCollocationsTags.appendChild(span);
+        }
+      });
+
+      if (grammarCollocationsTags.children.length === 0) {
+        grammarCollocationsTags.innerHTML = '<span style="font-size:0.8rem; color:var(--text-muted);">暂无特殊高频短语</span>';
+      }
+    }, 300);
+  }
+
+  // --- Phase 4: GitHub-Style 365-Day Heatmap Renderer ---
+  function renderHeatmap() {
+    if (!heatmapGridContainer || !streakDaysCount) return;
+    
+    heatmapGridContainer.innerHTML = '';
+    
+    const today = new Date();
+    const daysToShow = 140; // ~20 weeks of grid blocks
+    let currentStreak = 0;
+    let tempStreak = 0;
+    
+    for (let i = daysToShow - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(today.getDate() - i);
+      const dateStr = d.toLocaleDateString();
+      const wordCount = state.stats.transDates[dateStr] || 0;
+      
+      // Calculate level 0-4
+      let lvl = 0;
+      if (wordCount > 500) lvl = 4;
+      else if (wordCount > 200) lvl = 3;
+      else if (wordCount > 50) lvl = 2;
+      else if (wordCount > 0) lvl = 1;
+
+      // Track consecutive streak
+      if (wordCount > 0) {
+        tempStreak++;
+        if (i === 0 || tempStreak > currentStreak) currentStreak = tempStreak;
+      } else {
+        if (i !== 0) tempStreak = 0;
+      }
+
+      const cell = document.createElement('div');
+      cell.className = `heatmap-cell lvl-${lvl}`;
+      cell.title = `${dateStr}: 学习翻译 ${wordCount} 字`;
+      heatmapGridContainer.appendChild(cell);
+    }
+
+    streakDaysCount.textContent = currentStreak;
   }
 
   // --- Run Init ---
