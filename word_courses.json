@@ -119,6 +119,126 @@
       "trans": "易受伤害的，脆弱的",
       "exampleEn": "Children are particularly vulnerable to diseases.",
       "exampleZh": "儿童特别容易受到疾病的侵袭。"
+    },
+    {
+      "word": "absolute",
+      "pron": "/ˈæbsəluːt/",
+      "pos": "adj.",
+      "trans": "绝对的，完全的",
+      "exampleEn": "I have absolute confidence in your ability.",
+      "exampleZh": "我对你的能力有绝对的信心。"
+    },
+    {
+      "word": "benefit",
+      "pron": "/ˈbenɪfɪt/",
+      "pos": "n./v.",
+      "trans": "利益，好处；有益于",
+      "exampleEn": "Regular exercise will benefit your health.",
+      "exampleZh": "定期运动有益于你的健康。"
+    },
+    {
+      "word": "challenge",
+      "pron": "/ˈtʃælɪndʒ/",
+      "pos": "n./v.",
+      "trans": "挑战，质疑",
+      "exampleEn": "Accepting new challenges makes you grow.",
+      "exampleZh": "接受新挑战能让你成长。"
+    },
+    {
+      "word": "deliberate",
+      "pron": "/dɪˈlɪbərət/",
+      "pos": "adj./v.",
+      "trans": "深思熟虑的，故意的",
+      "exampleEn": "It was a deliberate attempt to cause confusion.",
+      "exampleZh": "这是一次蓄意制造混乱的尝试。"
+    },
+    {
+      "word": "eliminate",
+      "pron": "/ɪˈlɪmɪneɪt/",
+      "pos": "v.",
+      "trans": "消除，排除，淘汰",
+      "exampleEn": "We should eliminate unnecessary expenses.",
+      "exampleZh": "我们应该消除不必要的开支。"
+    },
+    {
+      "word": "flexible",
+      "pron": "/ˈfleksəbl/",
+      "pos": "adj.",
+      "trans": "灵活的，可变通的",
+      "exampleEn": "Our schedule is flexible enough to accommodate changes.",
+      "exampleZh": "我们的日程安排非常灵活，可以适应变化。"
+    },
+    {
+      "word": "generous",
+      "pron": "/ˈdʒenərəs/",
+      "pos": "adj.",
+      "trans": "慷慨的，大方的",
+      "exampleEn": "He made a generous donation to the charity.",
+      "exampleZh": "他向该慈善机构捐赠了一笔慷慨的资金。"
+    },
+    {
+      "word": "highlight",
+      "pron": "/ˈhaɪlaɪt/",
+      "pos": "v./n.",
+      "trans": "强调，突出；最精彩部分",
+      "exampleEn": "The report highlights the key issues in education.",
+      "exampleZh": "报告突出了教育中的关键问题。"
+    },
+    {
+      "word": "inevitable",
+      "pron": "/ɪnˈevɪtəbl/",
+      "pos": "adj.",
+      "trans": "不可避免的，必然的",
+      "exampleEn": "Change is an inevitable part of life.",
+      "exampleZh": "改变是生活中不可避免的一部分。"
+    },
+    {
+      "word": "justify",
+      "pron": "/ˈdʒʌstɪfaɪ/",
+      "pos": "v.",
+      "trans": "证明……是正当的，替……辩护",
+      "exampleEn": "Nothing can justify such rude behavior.",
+      "exampleZh": "没有什么能为这种粗鲁的行为开脱。"
+    },
+    {
+      "word": "keen",
+      "pron": "/kiːn/",
+      "pos": "adj.",
+      "trans": "敏锐的，热心的，渴望的",
+      "exampleEn": "She has a keen eye for modern fashion.",
+      "exampleZh": "她对现代时尚有着敏锐的眼光。"
+    },
+    {
+      "word": "liberty",
+      "pron": "/ˈlɪbəti/",
+      "pos": "n.",
+      "trans": "自由，自主",
+      "exampleEn": "They fought bravely for freedom and liberty.",
+      "exampleZh": "他们为自由而英勇奋斗。"
+    },
+    {
+      "word": "motivate",
+      "pron": "/ˈməʊtɪveɪt/",
+      "pos": "v.",
+      "trans": "激励，激发，推动",
+      "exampleEn": "Praise can motivate students to perform better.",
+      "exampleZh": "表扬可以激励学生表现得更好。"
+    },
+    {
+      "word": "navigate",
+      "pron": "/ˈnævɪɡeɪt/",
+      "pos": "v.",
+      "trans": "导航，驾驶，应对",
+      "exampleEn": "GPS technology helps drivers navigate unfamiliar cities.",
+      "exampleZh": "GPS 技术帮助司机在不熟悉的城市导航。"
+    },
+    {
+      "word": "optimize",
+      "pron": "/ˈɒptɪmaɪz/",
+      "pos": "v.",
+      "trans": "优化，使完美",
+      "exampleEn": "We need to optimize the software for speed.",
+      "exampleZh": "我们需要优化软件速度。"
     }
   ],
   "cet6": [
@@ -201,6 +321,46 @@
       "trans": "先例，前例",
       "exampleEn": "This court ruling sets an important precedent.",
       "exampleZh": "这一法庭裁决树立了一个重要的先例。"
+    },
+    {
+      "word": "ambiguity",
+      "pron": "/ˌæmbɪˈɡjuːəti/",
+      "pos": "n.",
+      "trans": "模棱两可，歧义",
+      "exampleEn": "Clear speech leaves no room for ambiguity.",
+      "exampleZh": "清晰的表达不给歧义留有空间。"
+    },
+    {
+      "word": "catalyst",
+      "pron": "/ˈkætəlɪst/",
+      "pos": "n.",
+      "trans": "催化剂，促使变化的人或因素",
+      "exampleEn": "The new policy served as a catalyst for economic growth.",
+      "exampleZh": "新政策成为了经济增长的催化剂。"
+    },
+    {
+      "word": "discrepancy",
+      "pron": "/dɪsˈkrepənsi/",
+      "pos": "n.",
+      "trans": "差异，不一致",
+      "exampleEn": "There was a noticeable discrepancy between the two balance sheets.",
+      "exampleZh": "两张资产负债表之间存在显著差异。"
+    },
+    {
+      "word": "exacerbate",
+      "pron": "/ɪɡˈzæsəbeɪt/",
+      "pos": "v.",
+      "trans": "使恶化，使加重",
+      "exampleEn": "High winds will exacerbate the forest fire.",
+      "exampleZh": "大风会加剧森林大火。"
+    },
+    {
+      "word": "hierarchy",
+      "pron": "/ˈhaɪərɑːki/",
+      "pos": "n.",
+      "trans": "等级制度，阶层",
+      "exampleEn": "He rose quickly through the corporate hierarchy.",
+      "exampleZh": "他在公司层级中迅速提升。"
     }
   ],
   "kaoyan": [
@@ -243,6 +403,30 @@
       "trans": "固有的，内在的",
       "exampleEn": "Flexibility is an intrinsic quality of rubber.",
       "exampleZh": "弹性是橡胶的固质特性。"
+    },
+    {
+      "word": "paradigm",
+      "pron": "/ˈpærədaɪm/",
+      "pos": "n.",
+      "trans": "范式，典范",
+      "exampleEn": "The discovery created a new scientific paradigm.",
+      "exampleZh": "这一发现开创了新的科学范式。"
+    },
+    {
+      "word": "scrutiny",
+      "pron": "/ˈskruːtəni/",
+      "pos": "n.",
+      "trans": "仔细检查，审查",
+      "exampleEn": "The deal was subjected to strict official scrutiny.",
+      "exampleZh": "该交易接受了严格的官方审查。"
+    },
+    {
+      "word": "unprecedented",
+      "pron": "/ʌnˈpresɪdentɪd/",
+      "pos": "adj.",
+      "trans": "史无前例的，空前的",
+      "exampleEn": "The region suffered an unprecedented drought.",
+      "exampleZh": "该地区遭遇了史无前例的干旱。"
     }
   ],
   "ielts": [
@@ -285,6 +469,22 @@
       "trans": "占主导地位的，显著的",
       "exampleEn": "English is the predominant language in international commerce.",
       "exampleZh": "英语是国际商业占主导地位的语言。"
+    },
+    {
+      "word": "sustainable",
+      "pron": "/səˈsteɪnəbl/",
+      "pos": "adj.",
+      "trans": "可持续的，能维持的",
+      "exampleEn": "Solar power is a sustainable source of energy.",
+      "exampleZh": "太阳能是一种可持续的能源。"
+    },
+    {
+      "word": "transformation",
+      "pron": "/ˌtrænsfəˈmeɪʃn/",
+      "pos": "n.",
+      "trans": "转变，变革",
+      "exampleEn": "The digital transformation changed how businesses operate.",
+      "exampleZh": "数字化转型改变了企业的运营方式。"
     }
   ]
 }
