@@ -1,682 +1,646 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
-  <!-- Theme Initialization to prevent flicker -->
-  <script>
-    (function() {
-      try {
-        const theme = localStorage.getItem('aura_theme') || 'light';
-        if (theme === 'system') {
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-        } else {
-          document.documentElement.setAttribute('data-theme', theme);
-        }
-      } catch (e) {
-        console.error('Theme check failed', e);
-      }
-    })();
-  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AuraTranslate - 极具现代感的极简毛玻璃风格智能翻译网站，支持实时翻译、语音输入、朗读、历史与收藏。">
-  <title>AuraTranslate | 极光翻译</title>
+  <title>AuraTranslate - 极光 AI 智能翻译与英语学习工作站</title>
+  <meta name="description" content="极光AI翻译（AuraTranslate）是一款集即时翻译、拍照/截图OCR识别、双栏沉浸式划词阅读、艾宾浩斯记忆生词本及CET四六级真题备考于一体的随身英语学习工作站。">
   
-  <!-- Preconnect to Google Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome Icons for modern aesthetic -->
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Main Stylesheet -->
+  <!-- Core Stylesheet -->
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <!-- Decorative background glows -->
+  <!-- Ambient Background Glow Blobs -->
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
   <div class="bg-glow bg-glow-3"></div>
 
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo">
-        <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
-        <h1>Aura<span>Translate</span></h1>
+  <!-- Main 2-Column App Layout -->
+  <div class="app-layout">
+    
+    <!-- Left Glassmorphism Vertical Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+          <h1>Aura<span>Translate</span></h1>
+        </div>
       </div>
-      
-      <div class="header-actions">
+
+      <!-- Vertical Sidebar Navigation Menu -->
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-btn active" data-tab="translation">
+          <i class="fa-solid fa-language"></i>
+          <span>智能翻译</span>
+        </button>
+        <button class="sidebar-nav-btn" data-tab="words">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <span>单词学习</span>
+        </button>
+        <button class="sidebar-nav-btn" data-tab="sentences">
+          <i class="fa-solid fa-book-open-reader"></i>
+          <span>语句学习</span>
+        </button>
+        <button class="sidebar-nav-btn" data-tab="dashboard">
+          <i class="fa-solid fa-chart-simple"></i>
+          <span>学习看板</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer Controls -->
+      <div class="sidebar-footer">
         <!-- Engine selector -->
-        <div class="engine-selector-wrapper" style="display: flex; align-items: center; gap: 0.35rem; margin-right: 0.5rem; background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.2rem 0.5rem; border-radius: 20px;">
-          <i class="fa-solid fa-microchip" style="color: var(--accent-primary); font-size: 0.8rem;" title="翻译引擎"></i>
-          <select id="engine-select" style="background: transparent; border: none; font-size: 0.75rem; color: var(--text-main); font-weight: 600; outline: none; cursor: pointer;">
-            <option value="default">默认极光引擎</option>
-            <option value="academic">学术严谨引擎</option>
-            <option value="colloquial">口语拟人引擎</option>
-            <option value="custom">大模型 API Key</option>
+        <div class="sidebar-control-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight:700;"><i class="fa-solid fa-microchip"></i> 引擎:</span>
+          <select id="engine-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.25rem 0.4rem; font-size: 0.75rem; color: var(--text-main); font-weight: 600; outline: none;">
+            <option value="default">默认极光</option>
+            <option value="academic">学术严谨</option>
+            <option value="colloquial">口语拟人</option>
+            <option value="custom">API Key</option>
           </select>
-          <button id="btn-config-key" class="mini-icon-btn" title="配置 API Key" style="font-size: 0.7rem; color: var(--text-muted);"><i class="fa-solid fa-key"></i></button>
+          <button id="btn-config-key" class="mini-icon-btn" title="配置 API Key" style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-key"></i></button>
         </div>
 
         <!-- TTS speed adjustment -->
-        <div class="tts-speed-control" style="display: flex; align-items: center; gap: 0.5rem; margin-right: 0.75rem; background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.25rem 0.6rem; border-radius: 20px;">
-          <i class="fa-solid fa-gauge-high" style="color: var(--accent-primary); font-size: 0.8rem;" title="朗读语速"></i>
-          <input type="range" id="tts-speed-slider" min="0.5" max="1.8" step="0.1" value="1.0" style="width: 50px; cursor: pointer; height: 3px; accent-color: var(--accent-primary); margin: 0;">
-          <span id="tts-speed-label" style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; width: 25px;">1.0x</span>
+        <div class="sidebar-control-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight:700;"><i class="fa-solid fa-gauge-high"></i> 语速:</span>
+          <input type="range" id="tts-speed-slider" min="0.5" max="1.8" step="0.1" value="1.0" style="width: 80px; accent-color: var(--accent-primary); cursor: pointer;">
+          <span id="tts-speed-label" style="font-size: 0.75rem; font-weight: 700; color: var(--text-main);">1.0x</span>
         </div>
-        
-        <button id="theme-toggle" class="icon-btn" title="切换主题" aria-label="Toggle Theme">
-          <i class="fa-solid fa-moon"></i>
-        </button>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 0.75rem;">
+          <span style="font-size: 0.75rem; color: var(--text-muted);">主题风格</span>
+          <button id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Theme" title="切换主题">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+        </div>
       </div>
-    </header>
+    </aside>
 
-    <!-- Main Content Area -->
-    <main class="app-main">
-      <!-- Translator Card -->
-      <section class="translator-card">
-        <!-- Language Selector Bar -->
-        <div class="selector-bar">
-          <div class="lang-select-wrapper">
-            <select id="src-lang" aria-label="Source Language">
-              <option value="en">英语 (English)</option>
-              <option value="zh-CN" selected>中文 (简体)</option>
-              <option value="zh-TW">中文 (繁体)</option>
-              <option value="ja">日语 (日本語)</option>
-              <option value="ko">韩语 (한국어)</option>
-              <option value="fr">法语 (Français)</option>
-              <option value="es">西班牙语 (Español)</option>
-              <option value="de">德语 (Deutsch)</option>
-              <option value="ru">俄语 (Русский)</option>
-              <option value="it">意大利语 (Italiano)</option>
-              <option value="pt">葡萄牙语 (Português)</option>
-            </select>
+    <!-- Right Main Workspace Content Area -->
+    <main class="app-main-content">
+      
+      <!-- Section 1: 🌐 智能翻译 (Translation Hub) -->
+      <section id="section-translation" class="main-section active">
+        <div class="translator-card">
+          <!-- Language Selector Row -->
+          <div class="selector-bar">
+            <div class="lang-select-wrapper">
+              <select id="src-lang" aria-label="Source Language">
+                <option value="en">英语 (English)</option>
+                <option value="zh-CN" selected>中文 (简体)</option>
+                <option value="zh-TW">中文 (繁体)</option>
+                <option value="ja">日语 (日本語)</option>
+                <option value="ko">韩语 (한국어)</option>
+                <option value="fr">法语 (Français)</option>
+                <option value="es">西班牙语 (Español)</option>
+                <option value="de">德语 (Deutsch)</option>
+                <option value="ru">俄语 (Русский)</option>
+                <option value="it">意大利语 (Italiano)</option>
+                <option value="pt">葡萄牙语 (Português)</option>
+              </select>
+            </div>
+
+            <button id="swap-lang" class="swap-btn" title="对调语言" aria-label="Swap Languages">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+
+            <div class="lang-select-wrapper">
+              <select id="tgt-lang" aria-label="Target Language">
+                <option value="en" selected>英语 (English)</option>
+                <option value="zh-CN">中文 (简体)</option>
+                <option value="zh-TW">中文 (繁体)</option>
+                <option value="ja">日语 (日本語)</option>
+                <option value="ko">韩语 (한국어)</option>
+                <option value="fr">法语 (Français)</option>
+                <option value="es">西班牙语 (Español)</option>
+                <option value="de">德语 (Deutsch)</option>
+                <option value="ru">俄语 (Русский)</option>
+                <option value="it">意大利语 (Italiano)</option>
+                <option value="pt">葡萄牙语 (Português)</option>
+              </select>
+            </div>
           </div>
 
-          <button id="swap-lang" class="swap-btn" title="对调语言" aria-label="Swap Languages">
-            <i class="fa-solid fa-arrows-rotate"></i>
-          </button>
-
-          <div class="lang-select-wrapper">
-            <select id="tgt-lang" aria-label="Target Language">
-              <option value="en" selected>英语 (English)</option>
-              <option value="zh-CN">中文 (简体)</option>
-              <option value="zh-TW">中文 (繁体)</option>
-              <option value="ja">日语 (日本語)</option>
-              <option value="ko">韩语 (한국어)</option>
-              <option value="fr">法语 (Français)</option>
-              <option value="es">西班牙语 (Español)</option>
-              <option value="de">德语 (Deutsch)</option>
-              <option value="ru">俄语 (Русский)</option>
-              <option value="it">意大利语 (Italiano)</option>
-              <option value="pt">葡萄牙语 (Português)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Text Areas Grid -->
-        <div class="text-areas-container">
-          <!-- Source Input Box -->
-          <div class="text-box-wrapper source-wrapper" id="source-wrapper">
-            <!-- OCR Drag and drop Overlay -->
-            <div id="ocr-drag-overlay" class="ocr-drag-overlay hidden">
-              <div class="ocr-overlay-content">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <p>释放图片，立即提取英文并翻译</p>
+          <!-- Text Areas Grid -->
+          <div class="text-areas-container">
+            <!-- Source Input Box -->
+            <div class="text-box-wrapper source-wrapper" id="source-wrapper">
+              <div id="ocr-drag-overlay" class="ocr-drag-overlay hidden">
+                <div class="ocr-overlay-content">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <p>释放图片，立即提取英文并翻译</p>
+                </div>
               </div>
-            </div>
-            <!-- OCR Parser loader -->
-            <div id="ocr-loader" class="ocr-loader-overlay hidden">
-              <div class="spinner"></div>
-              <p>正在分析并提取图片文本...</p>
-            </div>
-            <textarea id="src-text" placeholder="输入文本，或拖入图片、粘贴截图翻译..." maxlength="3000" aria-label="Source Text"></textarea>
-            <div class="text-box-footer">
-              <div class="box-actions">
-                <button id="btn-speak-src" class="action-btn" title="朗读源文本" aria-label="Speak Source Text">
-                  <i class="fa-solid fa-volume-high"></i>
-                </button>
-                <button id="btn-mic-src" class="action-btn mic-btn" title="语音输入" aria-label="Voice Input">
-                  <i class="fa-solid fa-microphone"></i>
-                </button>
-                <button id="btn-ocr-hint" class="action-btn" title="已启用OCR：支持拖入图片文件或截图Ctrl+V粘贴解析" aria-label="OCR Active">
-                  <i class="fa-solid fa-file-image"></i>
-                </button>
-                <button id="btn-clear" class="action-btn" title="清空文本" aria-label="Clear Text">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
-              <div class="char-count"><span id="src-char-count">0</span> / 3000</div>
-            </div>
-          </div>
-
-          <!-- Target Output Box -->
-          <div class="text-box-wrapper target-wrapper">
-            <div class="output-container">
-              <div id="tgt-text-placeholder" class="placeholder-text">翻译结果将在这里显示...</div>
-              <div id="tgt-text" class="output-text" tabindex="0"></div>
-              
-              <!-- Inline loading spinner -->
-              <div id="translate-loader" class="loader-overlay hidden">
+              <div id="ocr-loader" class="ocr-loader-overlay hidden">
                 <div class="spinner"></div>
+                <p>正在分析并提取图片文本...</p>
               </div>
-            </div>
-            <div class="text-box-footer">
-              <div class="box-actions">
-                <button id="btn-speak-tgt" class="action-btn" title="朗读翻译文本" aria-label="Speak Target Text" disabled>
-                  <i class="fa-solid fa-volume-high"></i>
-                </button>
-                <button id="btn-copy-tgt" class="action-btn" title="复制翻译文本" aria-label="Copy Translation" disabled>
-                  <i class="fa-solid fa-copy"></i>
-                </button>
-                <button id="btn-star-tgt" class="action-btn" title="加入收藏" aria-label="Favorite Translation" disabled>
-                  <i class="fa-regular fa-star"></i>
-                </button>
-                <button id="btn-learn-tgt" class="action-btn" title="存入生词本" aria-label="Add to Vocabulary" disabled>
-                  <i class="fa-solid fa-graduation-cap"></i>
-                </button>
-                <button id="btn-analyze-grammar" class="action-btn" title="语法剖析" aria-label="Analyze Grammar" disabled>
-                  <i class="fa-solid fa-diagram-project"></i>
-                </button>
-              </div>
-              <div class="translate-status" id="translate-status">
-                <i class="fa-solid fa-check-circle success-icon hidden"></i>
-                <span id="status-message">已就绪</span>
+              <textarea id="src-text" placeholder="输入文本，或拖入图片、粘贴截图翻译..." maxlength="3000" aria-label="Source Text"></textarea>
+              <div class="text-box-footer">
+                <div class="box-actions">
+                  <button id="btn-speak-src" class="action-btn" title="朗读源文本" aria-label="Speak Source Text">
+                    <i class="fa-solid fa-volume-high"></i>
+                  </button>
+                  <button id="btn-mic-src" class="action-btn mic-btn" title="语音输入" aria-label="Voice Input">
+                    <i class="fa-solid fa-microphone"></i>
+                  </button>
+                  <button id="btn-ocr-hint" class="action-btn" title="支持拍照/截图拖入解析" aria-label="OCR Active">
+                    <i class="fa-solid fa-file-image"></i>
+                  </button>
+                  <button id="btn-clear" class="action-btn" title="清空文本" aria-label="Clear Text">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+                <div class="char-count"><span id="src-char-count">0</span> / 3000</div>
               </div>
             </div>
 
-            <!-- AI Grammar Breakdown Drawer -->
-            <div id="grammar-breakdown-drawer" class="grammar-breakdown-drawer hidden">
-              <div class="grammar-header">
-                <span class="grammar-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-primary);"></i> AI 句子语法剖析</span>
-                <button id="btn-close-grammar" class="close-btn" style="font-size:1rem;">&times;</button>
-              </div>
-              <div class="grammar-body" id="grammar-body-content">
-                <div class="grammar-section">
-                  <div class="grammar-tag-label">句型结构</div>
-                  <p id="grammar-structure-text" class="grammar-text">加载中...</p>
+            <!-- Target Output Box -->
+            <div class="text-box-wrapper target-wrapper">
+              <div class="output-container">
+                <div id="tgt-text-placeholder" class="placeholder-text">翻译结果将在这里显示...</div>
+                <div id="tgt-text" class="output-text" tabindex="0"></div>
+                <div id="translate-loader" class="loader-overlay hidden">
+                  <div class="spinner"></div>
                 </div>
-                <div class="grammar-section">
-                  <div class="grammar-tag-label">核心词汇与固定搭配</div>
-                  <div id="grammar-collocations-tags" class="vocab-tags"></div>
+              </div>
+              <div class="text-box-footer">
+                <div class="box-actions">
+                  <button id="btn-speak-tgt" class="action-btn" title="朗读翻译文本" aria-label="Speak Target Text" disabled>
+                    <i class="fa-solid fa-volume-high"></i>
+                  </button>
+                  <button id="btn-copy-tgt" class="action-btn" title="复制翻译文本" aria-label="Copy Translation" disabled>
+                    <i class="fa-solid fa-copy"></i>
+                  </button>
+                  <button id="btn-star-tgt" class="action-btn" title="加入收藏" aria-label="Favorite Translation" disabled>
+                    <i class="fa-regular fa-star"></i>
+                  </button>
+                  <button id="btn-learn-tgt" class="action-btn" title="存入生词本" aria-label="Add to Vocabulary" disabled>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                  </button>
+                  <button id="btn-analyze-grammar" class="action-btn" title="语法剖析" aria-label="Analyze Grammar" disabled>
+                    <i class="fa-solid fa-diagram-project"></i>
+                  </button>
+                </div>
+                <div class="translate-status" id="translate-status">
+                  <i class="fa-solid fa-check-circle success-icon hidden"></i>
+                  <span id="status-message">已就绪</span>
+                </div>
+              </div>
+
+              <!-- AI Grammar Breakdown Drawer -->
+              <div id="grammar-breakdown-drawer" class="grammar-breakdown-drawer hidden">
+                <div class="grammar-header">
+                  <span class="grammar-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-primary);"></i> AI 句子语法剖析</span>
+                  <button id="btn-close-grammar" class="close-btn" style="font-size:1rem;">&times;</button>
+                </div>
+                <div class="grammar-body" id="grammar-body-content">
+                  <div class="grammar-section">
+                    <div class="grammar-tag-label">句型结构</div>
+                    <p id="grammar-structure-text" class="grammar-text">加载中...</p>
+                  </div>
+                  <div class="grammar-section">
+                    <div class="grammar-tag-label">核心词汇与固定搭配</div>
+                    <div id="grammar-collocations-tags" class="vocab-tags"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Manual Translate Trigger -->
+          <div class="manual-trigger-container">
+            <button id="btn-translate-manual" class="glow-btn">
+              <span>立即翻译</span>
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Manual Translate Trigger (mainly for backup / instant check) -->
-        <div class="manual-trigger-container">
-          <button id="btn-translate-manual" class="glow-btn">
-            <span>立即翻译</span>
-            <i class="fa-solid fa-paper-plane"></i>
-          </button>
+        <!-- History & Favorites Records Panel -->
+        <div class="records-section" style="margin-top: 1.5rem;">
+          <div class="tabs-header">
+            <button id="tab-history" class="tab-btn active" data-tab="history">
+              <i class="fa-solid fa-history"></i> 历史记录
+            </button>
+            <button id="tab-favorites" class="tab-btn" data-tab="favorites">
+              <i class="fa-solid fa-star"></i> 我的收藏
+            </button>
+            <button id="btn-clear-records" class="text-link-btn" title="清空全部">清空</button>
+          </div>
+
+          <div class="tabs-content">
+            <div id="history-panel" class="tab-panel active">
+              <div class="empty-state" id="history-empty">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <p>暂无历史翻译记录</p>
+              </div>
+              <ul id="history-list" class="records-list"></ul>
+            </div>
+            <div id="favorites-panel" class="tab-panel">
+              <div class="empty-state" id="favorites-empty">
+                <i class="fa-solid fa-star"></i>
+                <p>暂无收藏记录</p>
+              </div>
+              <ul id="favorites-list" class="records-list"></ul>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Sidebar Tabs (History & Favorites) -->
-      <section class="records-section">
-        <div class="tabs-header">
-          <button id="tab-history" class="tab-btn active" data-tab="history">
-            <i class="fa-solid fa-history"></i> 历史记录
+      <!-- Section 2: 📚 单词学习 (Word Learning Hub) -->
+      <section id="section-words" class="main-section">
+        <div class="academy-nav" style="margin-bottom: 1.25rem;">
+          <button id="subtab-word-learning" class="subtab-btn active" data-subtab="word-learning">
+            <i class="fa-solid fa-graduation-cap"></i> 分级单词学习
           </button>
-          <button id="tab-favorites" class="tab-btn" data-tab="favorites">
-            <i class="fa-solid fa-star"></i> 我的收藏
+          <button id="subtab-vocab" class="subtab-btn" data-subtab="vocab">
+            <i class="fa-solid fa-book"></i> 我的生词本 & Anki 复习
           </button>
-          <button id="tab-academy" class="tab-btn" data-tab="academy">
-            <i class="fa-solid fa-graduation-cap"></i> 英语学习
-          </button>
-          <button id="btn-clear-records" class="text-link-btn" title="清空全部">清空</button>
         </div>
 
-        <div class="tabs-content">
-          <!-- History List -->
-          <div id="history-panel" class="tab-panel active">
-            <div class="empty-state" id="history-empty">
-              <i class="fa-solid fa-clock-rotate-left"></i>
-              <p>暂无历史翻译记录</p>
-            </div>
-            <ul id="history-list" class="records-list"></ul>
-          </div>
+        <div class="academy-sub-content">
+          <!-- 0. Word Learning Course Panel -->
+          <div id="academy-word-learning-view" class="academy-sub-panel active">
+            <div class="word-course-container">
+              <div class="course-header-controls" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.85rem 1.15rem; border-radius: 16px; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-solid fa-book-bookmark" style="color: var(--accent-primary);"></i>
+                  <select id="course-book-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.35rem 0.65rem; color: var(--text-main); font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer;">
+                    <option value="cet4">四级核心词汇 (CET-4 2607词)</option>
+                    <option value="cet6">六级高频词汇 (CET-6 2345词)</option>
+                    <option value="kaoyan">考研英语必备 (Postgraduate)</option>
+                    <option value="ielts">雅思核心词汇 (IELTS)</option>
+                  </select>
+                </div>
 
-          <!-- Favorites List -->
-          <div id="favorites-panel" class="tab-panel">
-            <div class="empty-state" id="favorites-empty">
-              <i class="fa-solid fa-star"></i>
-              <p>暂无收藏记录</p>
-            </div>
-            <ul id="favorites-list" class="records-list"></ul>
-          </div>
-
-          <!-- Academy English Learning Panel -->
-          <div id="academy-panel" class="tab-panel">
-            <!-- Academy Sub navigation bar -->
-            <div class="academy-nav">
-              <button id="subtab-word-learning" class="subtab-btn active" data-subtab="word-learning">
-                <i class="fa-solid fa-graduation-cap"></i> 单词学习
-              </button>
-              <button id="subtab-vocab" class="subtab-btn" data-subtab="vocab">
-                <i class="fa-solid fa-book"></i> 生词本
-              </button>
-              <button id="subtab-reader" class="subtab-btn" data-subtab="reader">
-                <i class="fa-solid fa-book-open-reader"></i> 沉浸式阅读
-              </button>
-              <button id="subtab-quotes" class="subtab-btn" data-subtab="quotes">
-                <i class="fa-solid fa-quote-left"></i> 每日美句
-              </button>
-              <button id="subtab-cet" class="subtab-btn" data-subtab="cet">
-                <i class="fa-solid fa-award"></i> 四六级备考
-              </button>
-              <button id="subtab-dashboard" class="subtab-btn" data-subtab="dashboard">
-                <i class="fa-solid fa-chart-simple"></i> 数据看板
-              </button>
-            </div>
-
-            <!-- Academy Sub-panels content -->
-            <div class="academy-sub-content">
-              
-              <!-- 0. Word Learning Course Panel -->
-              <div id="academy-word-learning-view" class="academy-sub-panel active">
-                <div class="word-course-container">
-                  <!-- Header Controls: Book selector & Goal -->
-                  <div class="course-header-controls" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.85rem 1.15rem; border-radius: 16px; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <i class="fa-solid fa-book-bookmark" style="color: var(--accent-primary);"></i>
-                      <select id="course-book-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.35rem 0.65rem; color: var(--text-main); font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer;">
-                        <option value="cet4">四级核心词汇 (CET-4)</option>
-                        <option value="cet6">六级高频词汇 (CET-6)</option>
-                        <option value="kaoyan">考研英语必备 (Postgraduate)</option>
-                        <option value="ielts">雅思核心词汇 (IELTS)</option>
-                      </select>
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                      <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:600;">每日目标:</span>
-                      <select id="course-goal-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.35rem 0.5rem; color: var(--text-main); font-weight: 700; font-size: 0.8rem; outline: none;">
-                        <option value="10">10 词/日</option>
-                        <option value="20" selected>20 词/日</option>
-                        <option value="50">50 词/日</option>
-                      </select>
-                      <span style="font-size: 0.8rem; color: var(--text-main); font-weight: 700;">进度: <span id="course-progress-text" style="color: var(--accent-primary);">0 / 0</span></span>
-                    </div>
-                  </div>
-
-                  <!-- Learning Card Arena -->
-                  <div class="word-study-card" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; text-align: center; box-shadow: var(--glass-shadow);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                      <span class="status-badge" id="study-step-badge">第 1 步：全感官识记</span>
-                      <button id="btn-study-speak" class="mini-icon-btn" title="发音"><i class="fa-solid fa-volume-high"></i></button>
-                    </div>
-
-                    <h2 id="study-word-title" style="font-family: var(--font-title); font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Word</h2>
-                    <div id="study-word-pron" style="font-size: 1rem; color: var(--accent-secondary); margin-bottom: 0.85rem;">/pron/</div>
-                    
-                    <div id="study-word-trans-box" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 1rem; display: inline-block; width: 100%;">
-                      <span id="study-word-pos" style="font-weight: 800; color: var(--accent-primary); margin-right: 0.5rem;">v.</span>
-                      <span id="study-word-trans" style="font-size: 1.05rem; color: var(--text-main); font-weight: 600;">翻译释义</span>
-                    </div>
-
-                    <!-- Bilingual Sentence -->
-                    <div style="text-align: left; background: rgba(124, 58, 237, 0.05); border-left: 3px solid var(--accent-primary); padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
-                      <p id="study-word-ex-en" style="font-size: 0.95rem; color: var(--text-main); font-weight: 500; margin-bottom: 0.25rem;">Example sentence loading...</p>
-                      <p id="study-word-ex-zh" style="font-size: 0.85rem; color: var(--text-muted);">双语例句加载中...</p>
-                    </div>
-
-                    <!-- Spelling Quiz Area -->
-                    <div id="spelling-quiz-area" style="margin-bottom: 1.25rem;">
-                      <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">默写拼写检测：</label>
-                      <div style="display: flex; justify-content: center; gap: 0.5rem;">
-                        <input type="text" id="input-word-spelling" placeholder="输入正确的英文拼写..." style="width: 240px; padding: 0.6rem 0.8rem; border-radius: 12px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main); font-size: 1rem; text-align: center; outline: none; font-weight: 700;">
-                        <button id="btn-submit-spelling" class="glow-btn-outline" style="padding: 0.6rem 1rem;">验证</button>
-                      </div>
-                    </div>
-
-                    <!-- Footer Action -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
-                      <button id="btn-add-study-vocab" class="text-link-btn font-bold"><i class="fa-solid fa-plus"></i> 加入生词本</button>
-                      <button id="btn-next-study-word" class="glow-btn"><span>下一个词</span> <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                  </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:600;">每日目标:</span>
+                  <select id="course-goal-select" style="background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 0.35rem 0.5rem; color: var(--text-main); font-weight: 700; font-size: 0.8rem; outline: none;">
+                    <option value="10">10 词/日</option>
+                    <option value="20" selected>20 词/日</option>
+                    <option value="50">50 词/日</option>
+                  </select>
+                  <span style="font-size: 0.8rem; color: var(--text-main); font-weight: 700;">进度: <span id="course-progress-text" style="color: var(--accent-primary);">0 / 0</span></span>
                 </div>
               </div>
 
-              <!-- 1. Vocabulary & Flashcards Panel -->
-              <div id="academy-vocab-view" class="academy-sub-panel">
-                <div class="vocab-controls">
-                  <span class="vocab-count">生词总数: <span id="vocab-total-count">0</span></span>
-                  <span class="vocab-review-info hidden" id="vocab-review-info" style="font-size: 0.85rem; color: var(--text-muted); font-weight:600;">
-                    今日待复习: <strong id="vocab-review-count" style="color: #ef4444; font-weight:700;">0</strong>
-                  </span>
-                  <div class="vocab-layout-toggles">
-                    <button id="btn-load-full-vocab" class="mini-btn" title="载入四六级全量词库" style="margin-right: 0.5rem; color: var(--accent-primary);"><i class="fa-solid fa-cloud-arrow-down"></i> 载入四六级全量词库</button>
-                    <button id="btn-export-vocab" class="mini-btn" title="导出生词本 (CSV格式)" style="margin-right: 0.5rem;"><i class="fa-solid fa-file-export"></i> 导出</button>
-                    <button id="btn-toggle-vocab-list" class="mini-btn active" title="列表视图"><i class="fa-solid fa-list"></i></button>
-                    <button id="btn-toggle-vocab-card" class="mini-btn" title="卡片背诵"><i class="fa-solid fa-address-card"></i></button>
-                  </div>
+              <!-- Learning Card Arena -->
+              <div class="word-study-card" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; text-align: center; box-shadow: var(--glass-shadow);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <span class="status-badge" id="study-step-badge">第 1 步：全感官识记</span>
+                  <button id="btn-study-speak" class="mini-icon-btn" title="发音"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
 
-                <!-- List View of Vocabulary -->
-                <div id="vocab-list-container">
-                  <div class="empty-state" id="vocab-empty">
-                    <i class="fa-solid fa-book-open"></i>
-                    <p>生词本空空如也，快去翻译并保存一些词汇吧！</p>
-                  </div>
-                  <ul id="vocab-list" class="records-list"></ul>
-                </div>
-
-                <!-- 3D Card Study View of Vocabulary (hidden by default) -->
-                <div id="vocab-card-container" class="hidden">
-                  <div class="flashcard-deck">
-                    <div class="flashcard" id="study-flashcard">
-                      <div class="flashcard-inner" id="flashcard-inner">
-                        <!-- Front of the card: Word, Pronunciation -->
-                        <div class="flashcard-front">
-                          <div class="card-hint">英文单词 / 短语</div>
-                          <h3 class="card-word" id="card-front-word">AuraTranslate</h3>
-                          <div class="card-pron">
-                            <span id="card-front-pron">/ˈɔːrə/</span>
-                            <button id="btn-card-speak-src" class="mini-icon-btn" title="发音"><i class="fa-solid fa-volume-high"></i></button>
-                          </div>
-                          <div class="card-action-hint">点击卡片翻面显示释义</div>
-                        </div>
-                        <!-- Back of the card: Translation, Details -->
-                        <div class="flashcard-back">
-                          <div class="card-hint">中文释义</div>
-                          <p class="card-translation" id="card-back-translation">极光翻译</p>
-                          
-                          <!-- Ebbinghaus Memory Rating buttons -->
-                          <div class="card-review-bar" id="card-review-bar" style="margin: 0.75rem 0; width: 100%;">
-                            <button class="review-btn review-forgot" data-grade="1" title="完全忘记，需要立即重背">忘记</button>
-                            <button class="review-btn review-hard" data-grade="3" title="有些模糊，需要明天再背">模糊</button>
-                            <button class="review-btn review-easy" data-grade="5" title="非常熟练，可数天后复习">简单</button>
-                          </div>
-                          
-                          <div class="card-examples">
-                            <strong>保存于:</strong>
-                            <span id="card-back-time">刚刚</span>
-                          </div>
-                          <div class="card-action-hint">点击卡片翻回正面，或打分进行艾宾浩斯复习</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Flashcard Controls -->
-                  <div class="card-deck-controls">
-                    <button id="btn-prev-card" class="circle-btn" title="上一张"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button id="btn-practice-pron" class="glow-btn-outline" title="跟读练习"><i class="fa-solid fa-microphone"></i> <span>跟读</span></button>
-                    <button id="btn-mark-mastered" class="glow-btn-outline" title="已掌握并移出生词本"><i class="fa-solid fa-check"></i> <span>掌握</span></button>
-                    <button id="btn-next-card" class="circle-btn" title="下一张"><i class="fa-solid fa-chevron-right"></i></button>
-                  </div>
-
-                  <!-- Oral pronunciation tester in card -->
-                  <div id="card-practice-panel" class="practice-overlay hidden">
-                    <div class="practice-box">
-                      <h4>口语跟读评测</h4>
-                      <p class="practice-sentence" id="practice-target-sentence">AuraTranslate</p>
-                      <button id="btn-practice-mic" class="mic-round-btn"><i class="fa-solid fa-microphone"></i></button>
-                      <div class="practice-instructions" id="practice-status-text">点击麦克风，大声读出上面的英语</div>
-                      <div class="practice-result hidden" id="practice-result-panel">
-                        <span class="score-label">匹配度得分:</span>
-                        <div class="score-circle">
-                          <svg viewBox="0 0 36 36" class="circular-chart">
-                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-                            <path class="circle" id="practice-score-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-                            <text x="18" y="20.35" class="percentage" id="practice-score-text">0%</text>
-                          </svg>
-                        </div>
-                        <div class="practice-feedback" id="practice-feedback-text">很好，继续加油！</div>
-                      </div>
-                      <button id="btn-close-practice" class="text-link-btn">返回</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 1.5 Immersive Reader Panel -->
-              <div id="academy-reader-view" class="academy-sub-panel">
-                <div class="reader-container">
-                  <!-- Text Paste Area -->
-                  <div class="reader-input-area" id="reader-input-area">
-                    <textarea id="reader-paste-text" placeholder="在这里粘贴您的英文长篇文章、学术论文或真题阅读原文..."></textarea>
-                    
-                    <!-- Reading History bookshelf -->
-                    <div id="reader-history-bookshelf" class="reader-history-bookshelf hidden" style="margin-top: 0.75rem; text-align: left;">
-                      <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:700; display: block; margin-bottom: 0.4rem;"><i class="fa-solid fa-clock-rotate-left"></i> 最近阅读历史：</span>
-                      <div id="reader-history-list" class="reader-history-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
-                    </div>
-
-                    <div style="text-align: right; margin-top: 0.75rem;">
-                      <button id="btn-start-reading" class="glow-btn">
-                        <span>开始沉浸式阅读</span>
-                        <i class="fa-solid fa-book-open-reader"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <!-- Reading Canvas -->
-                  <div class="reader-reading-area hidden" id="reader-reading-area">
-                    <div class="reader-header-actions">
-                      <button id="btn-back-to-paste" class="text-link-btn" style="color: var(--accent-primary); font-weight:600;">
-                        <i class="fa-solid fa-arrow-left-long"></i> 返回重新粘贴
-                      </button>
-                      <span class="action-instructions">鼠标划选任意英文词句即可瞬间显示极光翻译</span>
-                    </div>
-                    <div class="reader-columns">
-                      <!-- Left column: Interactive reader -->
-                      <div class="reader-article-column" id="reader-article-content" tabindex="0"></div>
-                      <!-- Right column: Extracted dictionary board -->
-                      <div class="reader-sidebar-column">
-                        <h5>阅读摘录生词</h5>
-                        <div class="empty-state" id="reader-vocab-empty">
-                          <i class="fa-solid fa-highlighter"></i>
-                          <p>在左侧选中的词汇将记录于此</p>
-                        </div>
-                        <ul id="reader-vocab-list" class="records-list"></ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <h2 id="study-word-title" style="font-family: var(--font-title); font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Word</h2>
+                <div id="study-word-pron" style="font-size: 1rem; color: var(--accent-secondary); margin-bottom: 0.85rem;">/pron/</div>
                 
-                <!-- Floating Bubble Tooltip -->
-                <div id="reader-float-bubble" class="reader-float-bubble hidden">
-                  <div class="bubble-content">
-                    <div class="bubble-word" id="bubble-target-word">Word</div>
-                    <div class="bubble-pron" id="bubble-target-pron">/.../</div>
-                    <div class="bubble-trans" id="bubble-target-trans">正在加载极光翻译...</div>
-                    <div class="bubble-footer">
-                      <button id="btn-bubble-speak" class="mini-icon-btn" title="发音"><i class="fa-solid fa-volume-high"></i></button>
-                      <button id="btn-bubble-add-vocab" class="glow-btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" title="存入生词本">
-                        <i class="fa-solid fa-plus"></i> <span>存入生词</span>
+                <div id="study-word-trans-box" style="background: var(--input-bg); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 1rem; display: inline-block; width: 100%;">
+                  <span id="study-word-pos" style="font-weight: 800; color: var(--accent-primary); margin-right: 0.5rem;">v.</span>
+                  <span id="study-word-trans" style="font-size: 1.05rem; color: var(--text-main); font-weight: 600;">翻译释义</span>
+                </div>
+
+                <div style="text-align: left; background: rgba(124, 58, 237, 0.05); border-left: 3px solid var(--accent-primary); padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+                  <p id="study-word-ex-en" style="font-size: 0.95rem; color: var(--text-main); font-weight: 500; margin-bottom: 0.25rem;">Example sentence loading...</p>
+                  <p id="study-word-ex-zh" style="font-size: 0.85rem; color: var(--text-muted);">双语例句加载中...</p>
+                </div>
+
+                <div id="spelling-quiz-area" style="margin-bottom: 1.25rem;">
+                  <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 600;">默写拼写检测：</label>
+                  <div style="display: flex; justify-content: center; gap: 0.5rem;">
+                    <input type="text" id="input-word-spelling" placeholder="输入正确的英文拼写..." style="width: 240px; padding: 0.6rem 0.8rem; border-radius: 12px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main); font-size: 1rem; text-align: center; outline: none; font-weight: 700;">
+                    <button id="btn-submit-spelling" class="glow-btn-outline" style="padding: 0.6rem 1rem;">验证</button>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+                  <button id="btn-add-study-vocab" class="text-link-btn font-bold"><i class="fa-solid fa-plus"></i> 加入生词本</button>
+                  <button id="btn-next-study-word" class="glow-btn"><span>下一个词</span> <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1. Vocabulary & Flashcards Panel -->
+          <div id="academy-vocab-view" class="academy-sub-panel">
+            <div class="vocab-controls">
+              <span class="vocab-count">生词总数: <span id="vocab-total-count">0</span></span>
+              <span class="vocab-review-info hidden" id="vocab-review-info" style="font-size: 0.85rem; color: var(--text-muted); font-weight:600;">
+                今日待复习: <strong id="vocab-review-count" style="color: #ef4444; font-weight:700;">0</strong>
+              </span>
+              <div class="vocab-layout-toggles">
+                <button id="btn-load-full-vocab" class="mini-btn" title="载入四六级全量词库" style="margin-right: 0.5rem; color: var(--accent-primary);"><i class="fa-solid fa-cloud-arrow-down"></i> 载入 4,952 词库</button>
+                <button id="btn-export-vocab" class="mini-btn" title="导出生词本 (CSV格式)" style="margin-right: 0.5rem;"><i class="fa-solid fa-file-export"></i> 导出</button>
+                <button id="btn-toggle-vocab-list" class="mini-btn active" title="列表视图"><i class="fa-solid fa-list"></i></button>
+                <button id="btn-toggle-vocab-card" class="mini-btn" title="卡片背诵"><i class="fa-solid fa-address-card"></i></button>
+              </div>
+            </div>
+
+            <div id="vocab-list-container">
+              <div class="empty-state" id="vocab-empty">
+                <i class="fa-solid fa-book-open"></i>
+                <p>生词本空空如也，快去翻译并保存一些词汇吧！</p>
+              </div>
+              <ul id="vocab-list" class="records-list"></ul>
+            </div>
+
+            <div id="vocab-card-container" class="hidden">
+              <div class="flashcard-deck">
+                <div class="flashcard" id="study-flashcard">
+                  <div class="card-face card-front">
+                    <span class="card-hint">点击卡片查看翻面与释义</span>
+                    <button class="speaker-icon-btn" id="btn-card-speak-src" title="听发音">
+                      <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <h3 id="card-front-word">Loading...</h3>
+                    <p id="card-front-pron" class="phonetic">/ /</p>
+                  </div>
+                  <div class="card-face card-back">
+                    <span class="card-hint">点击翻回正面</span>
+                    <p id="card-back-translation" class="translation">释义加载中...</p>
+                    <div class="card-back-actions">
+                      <button id="btn-mark-mastered" class="mini-btn glow-btn-success">
+                        <i class="fa-solid fa-check"></i> 标为已掌握
+                      </button>
+                      <button id="btn-practice-pron" class="mini-btn glow-btn-outline">
+                        <i class="fa-solid fa-microphone"></i> 口语发音练习
                       </button>
                     </div>
                   </div>
-                  <div class="bubble-arrow"></div>
                 </div>
               </div>
-
-              <!-- 2. Daily Quotes Panel -->
-              <div id="academy-quotes-view" class="academy-sub-panel">
-                <div class="quote-card">
-                  <div class="quote-icon-top"><i class="fa-solid fa-quote-left"></i></div>
-                  <p class="quote-en" id="quote-en-text">Loading premium inspiration...</p>
-                  <p class="quote-zh" id="quote-zh-text">正在加载灵感名言...</p>
-                  
-                  <div class="quote-divider"></div>
-                  
-                  <!-- Interactive Vocabulary words from the quote -->
-                  <div class="quote-vocab">
-                    <h5>名言词汇拆解 (点击词汇直接加入生词本)：</h5>
-                    <div class="vocab-tags" id="quote-vocab-list"></div>
-                  </div>
-
-                  <div class="quote-footer">
-                    <button id="btn-speak-quote" class="circle-btn" title="朗读句子"><i class="fa-solid fa-volume-high"></i></button>
-                    <button id="btn-practice-quote" class="glow-btn-outline"><i class="fa-solid fa-microphone"></i> <span>口语练习</span></button>
-                  </div>
-                </div>
+              <div class="deck-controls">
+                <button id="btn-prev-card" class="glow-btn-outline"><i class="fa-solid fa-chevron-left"></i> 上一个</button>
+                <span class="deck-progress" id="deck-progress-text">1 / 1</span>
+                <button id="btn-next-card" class="glow-btn-outline">下一个 <i class="fa-solid fa-chevron-right"></i></button>
               </div>
-
-              <!-- 3. CET-4 / CET-6 Study Panel -->
-              <div id="academy-cet-view" class="academy-sub-panel">
-                <div class="cet-header">
-                  <div class="cet-tabs">
-                    <button id="btn-cet4-tab" class="cet-tab-btn active" data-cet="cet4">四级备考 (CET-4)</button>
-                    <button id="btn-cet6-tab" class="cet-tab-btn" data-cet="cet6">六级备考 (CET-6)</button>
-                  </div>
-                  <div class="cet-progress-wrapper">
-                    <div class="cet-progress-text">打卡进度: <span id="cet-progress-val">0%</span></div>
-                    <div class="cet-progress-bar"><div id="cet-progress-fill" style="width: 0%"></div></div>
-                  </div>
-                </div>
-
-                <!-- Day Selector (30-day prep calendar) -->
-                <div class="cet-study-calendar">
-                  <h5>30天备考计划 (点击打卡)：</h5>
-                  <div class="calendar-grid" id="cet-calendar-grid"></div>
-                </div>
-
-                <!-- Question Bank Quiz Card -->
-                <div class="quiz-card-wrapper">
-                  <div class="quiz-tabs">
-                    <button class="quiz-tab-btn active" data-quiz-type="vocab">词汇专项</button>
-                    <button class="quiz-tab-btn" data-quiz-type="reading">仔细阅读</button>
-                    <button id="btn-ai-generate-quiz" class="text-link-btn font-bold" style="color: var(--accent-primary);" title="基于生词本生成出题"><i class="fa-solid fa-robot"></i> 生词本出题</button>
-                    <button id="btn-import-quiz-bank" class="text-link-btn font-bold" title="导入自定义 JSON 题库"><i class="fa-solid fa-file-import"></i> 导入题库</button>
-                    <button id="btn-toggle-wrong-book" class="text-link-btn font-bold"><i class="fa-solid fa-book-bookmark"></i> 错题本 (<span id="wrong-count">0</span>)</button>
-                  </div>
-                  <input type="file" id="quiz-bank-file-input" accept=".json" style="display:none;">
-
-                  <div id="quiz-arena">
-                    <!-- Dynamic Question Area -->
-                    <div class="quiz-question-container">
-                      <div class="quiz-meta"><span id="quiz-q-num">第 1 题</span> | <span id="quiz-q-type">词汇选择</span></div>
-                      
-                      <!-- Reading Passage Wrapper (only shows for reading category) -->
-                      <div id="quiz-passage-container" class="quiz-passage hidden"></div>
-                      
-                      <div class="quiz-stem" id="quiz-question-stem">Loading practice question...</div>
-                      
-                      <div class="quiz-options-list" id="quiz-options-list"></div>
-                      
-                      <!-- Explanations Display (hidden until answered) -->
-                      <div id="quiz-explanation-panel" class="quiz-explanation hidden">
-                        <div class="explanation-header">
-                          <span class="status-badge" id="quiz-result-badge">正确</span>
-                          <span>正确答案: <strong id="quiz-correct-answer">A</strong></span>
-                        </div>
-                        <p class="explanation-body" id="quiz-explanation-text">这是这道题目的精细解析。</p>
-                      </div>
-                    </div>
-
-                    <!-- Quiz Navigation Footer -->
-                    <div class="quiz-footer">
-                      <button id="btn-save-wrong" class="glow-btn-outline" disabled><i class="fa-regular fa-bookmark"></i> 记入错题本</button>
-                      <button id="btn-next-question" class="glow-btn"><span>下一题</span> <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                  </div>
-
-                  <!-- Wrong Questions List Overlay (Toggleable drawer) -->
-                  <div id="wrong-questions-drawer" class="wrong-questions-drawer hidden">
-                    <div class="drawer-header">
-                      <h4>错题记录本</h4>
-                      <button id="btn-close-wrong" class="close-btn">&times;</button>
-                    </div>
-                    <div class="drawer-body">
-                      <div class="empty-state" id="wrong-empty">
-                        <i class="fa-solid fa-thumbs-up"></i>
-                        <p>太棒了，目前没有错题记录！</p>
-                      </div>
-                      <ul id="wrong-questions-list" class="records-list"></ul>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- 4. Learning Dashboard Panel -->
-              <div id="academy-dashboard-view" class="academy-sub-panel">
-                <div class="dashboard-grid">
-                  <!-- Stats Row -->
-                  <div class="stats-row">
-                    <div class="stat-card">
-                      <div class="stat-icon" style="background: rgba(124, 58, 237, 0.1); color: var(--accent-primary);"><i class="fa-solid fa-language"></i></div>
-                      <div class="stat-info">
-                        <span class="stat-title">累计翻译次数</span>
-                        <span class="stat-number" id="stat-trans-total">0</span>
-                      </div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fa-solid fa-circle-check"></i></div>
-                      <div class="stat-info">
-                        <span class="stat-title">已熟记生词数</span>
-                        <span class="stat-number" id="stat-vocab-mastered">0</span>
-                      </div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--accent-secondary);"><i class="fa-solid fa-award"></i></div>
-                      <div class="stat-info">
-                        <span class="stat-title">CET刷题总量</span>
-                        <span class="stat-number" id="stat-cet-questions">0</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- GitHub Style Heatmap Row -->
-                  <div class="heatmap-card">
-                    <div class="heatmap-header">
-                      <h5><i class="fa-solid fa-calendar-check" style="color: var(--accent-primary);"></i> 365 日学习状态热力图</h5>
-                      <div class="streak-badge"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> 连续打卡: <strong id="streak-days-count">0</strong> 天</div>
-                    </div>
-                    <div class="heatmap-grid-container" id="heatmap-grid-container"></div>
-                    <div class="heatmap-footer">
-                      <span class="heatmap-legend-label">Less</span>
-                      <div class="heatmap-legend">
-                        <span class="heatmap-cell lvl-0"></span>
-                        <span class="heatmap-cell lvl-1"></span>
-                        <span class="heatmap-cell lvl-2"></span>
-                        <span class="heatmap-cell lvl-3"></span>
-                        <span class="heatmap-cell lvl-4"></span>
-                      </div>
-                      <span class="heatmap-legend-label">More</span>
-                    </div>
-                  </div>
-
-                  <!-- Charts Row -->
-                  <div class="charts-row">
-                    <div class="chart-card">
-                      <h5>📈 最近 7 日翻译字数走势</h5>
-                      <div class="chart-container">
-                        <canvas id="chart-translation-activity"></canvas>
-                      </div>
-                    </div>
-                    <div class="chart-card">
-                      <h5>📚 生词本遗忘复习阶段</h5>
-                      <div class="chart-container">
-                        <canvas id="chart-vocab-distribution"></canvas>
-                      </div>
-                    </div>
-                    <div class="chart-card chart-full" style="grid-column: span 2;">
-                      <h5>🎙️ 近期口语评测分数趋势</h5>
-                      <div class="chart-container">
-                        <canvas id="chart-oral-scores"></canvas>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
       </section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-      <p>&copy; 2026 AuraTranslate. Designed with <i class="fa-solid fa-heart pulse"></i> for premium experience.</p>
-    </footer>
+      <!-- Section 3: 📖 语句学习 (Sentence & Reading Hub) -->
+      <section id="section-sentences" class="main-section">
+        <div class="academy-nav" style="margin-bottom: 1.25rem;">
+          <button id="subtab-reader" class="subtab-btn active" data-subtab="reader">
+            <i class="fa-solid fa-book-open-reader"></i> 沉浸式划词阅读
+          </button>
+          <button id="subtab-quotes" class="subtab-btn" data-subtab="quotes">
+            <i class="fa-solid fa-quote-left"></i> 每日双语美句
+          </button>
+          <button id="subtab-cet" class="subtab-btn" data-subtab="cet">
+            <i class="fa-solid fa-award"></i> 四六级真题阅读
+          </button>
+        </div>
+
+        <div class="academy-sub-content">
+          <!-- 1.5 Immersive Reader Panel -->
+          <div id="academy-reader-view" class="academy-sub-panel active">
+            <div class="reader-container">
+              <div class="reader-input-area" id="reader-input-area">
+                <textarea id="reader-paste-text" placeholder="在这里粘贴您的英文长篇文章、学术论文或真题阅读原文..."></textarea>
+                
+                <div id="reader-history-bookshelf" class="reader-history-bookshelf hidden" style="margin-top: 0.75rem; text-align: left;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight:700; display: block; margin-bottom: 0.4rem;"><i class="fa-solid fa-clock-rotate-left"></i> 最近阅读历史：</span>
+                  <div id="reader-history-list" class="reader-history-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                </div>
+
+                <div style="text-align: right; margin-top: 0.75rem;">
+                  <button id="btn-start-reading" class="glow-btn">
+                    <span>开始沉浸式阅读</span>
+                    <i class="fa-solid fa-book-open-reader"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="reader-reading-area hidden" id="reader-reading-area">
+                <div class="reader-toolbar">
+                  <button id="btn-stop-reading" class="text-link-btn"><i class="fa-solid fa-arrow-left"></i> 返回修改文本</button>
+                  <span class="reader-hint"><i class="fa-solid fa-mouse-pointer"></i> 选中文字可进行实时气泡翻译</span>
+                </div>
+                <div class="reader-article-content" id="reader-article-content"></div>
+              </div>
+
+              <div id="reader-tooltip-bubble" class="reader-tooltip-bubble hidden">
+                <div class="bubble-header">
+                  <span class="bubble-word" id="bubble-word-text">word</span>
+                  <span class="bubble-pron" id="bubble-pron-text">/pron/</span>
+                </div>
+                <p class="bubble-trans" id="bubble-trans-text">翻译加载中...</p>
+                <div class="bubble-actions">
+                  <button id="btn-bubble-add-vocab" class="mini-btn glow-btn-success"><i class="fa-solid fa-plus"></i> 加入生词本</button>
+                  <button id="btn-bubble-speak" class="mini-btn glow-btn-outline"><i class="fa-solid fa-volume-high"></i> 听发音</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Daily Quotes Panel -->
+          <div id="academy-quotes-view" class="academy-sub-panel">
+            <div class="quote-card">
+              <div class="quote-header">
+                <span class="quote-badge"><i class="fa-solid fa-calendar-day"></i> 每日双语研读</span>
+                <div class="quote-actions">
+                  <button id="btn-speak-quote" class="mini-icon-btn" title="朗读美句"><i class="fa-solid fa-volume-high"></i></button>
+                  <button id="btn-practice-quote" class="mini-icon-btn" title="口语跟读评测"><i class="fa-solid fa-microphone"></i></button>
+                </div>
+              </div>
+              <blockquote class="quote-en" id="quote-en-text">Loading daily inspiration...</blockquote>
+              <p class="quote-zh" id="quote-zh-text">加载每日灵感中...</p>
+              
+              <div class="quote-vocab-section">
+                <span class="vocab-section-title"><i class="fa-solid fa-key"></i> 句子重点词汇提取：</span>
+                <div class="vocab-tags" id="quote-vocab-tags"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. CET Exam Prep Panel -->
+          <div id="academy-cet-view" class="academy-sub-panel">
+            <div class="cet-dashboard">
+              <div class="cet-plan-bar">
+                <div class="plan-info">
+                  <h5><i class="fa-solid fa-calendar-check"></i> 四六级 30 天冲刺打卡</h5>
+                  <p id="cet-plan-status">已连续打卡 1 天 | 目标：CET-4 核心词汇与真题</p>
+                </div>
+                <div class="cet-target-toggle">
+                  <button class="target-btn active" id="btn-cet4-tab">CET-4</button>
+                  <button class="target-btn" id="btn-cet6-tab">CET-6</button>
+                </div>
+              </div>
+
+              <div class="quiz-card-wrapper">
+                <div class="quiz-tabs">
+                  <button class="quiz-tab-btn active" data-quiz-type="vocab">词汇专项</button>
+                  <button class="quiz-tab-btn" data-quiz-type="reading">仔细阅读</button>
+                  <button id="btn-ai-generate-quiz" class="text-link-btn font-bold" style="color: var(--accent-primary);" title="基于生词本生成出题"><i class="fa-solid fa-robot"></i> 生词本出题</button>
+                  <button id="btn-import-quiz-bank" class="text-link-btn font-bold" title="导入自定义 JSON 题库"><i class="fa-solid fa-file-import"></i> 导入题库</button>
+                  <button id="btn-toggle-wrong-book" class="text-link-btn font-bold"><i class="fa-solid fa-book-bookmark"></i> 错题本 (<span id="wrong-count">0</span>)</button>
+                </div>
+                <input type="file" id="quiz-bank-file-input" accept=".json" style="display:none;">
+
+                <div id="quiz-arena">
+                  <div class="quiz-question-container">
+                    <div class="quiz-meta"><span id="quiz-q-num">第 1 题</span> | <span id="quiz-q-type">词汇选择</span></div>
+                    <div id="quiz-passage-container" class="quiz-passage hidden"></div>
+                    <div class="quiz-stem" id="quiz-question-stem">Loading practice question...</div>
+                    <div class="quiz-options-list" id="quiz-options-list"></div>
+                    
+                    <div id="quiz-explanation-panel" class="quiz-explanation hidden">
+                      <div class="explanation-header">
+                        <span class="status-badge" id="quiz-result-badge">正确</span>
+                        <span>正确答案: <strong id="quiz-correct-answer">A</strong></span>
+                      </div>
+                      <p class="explanation-body" id="quiz-explanation-text">这是这道题目的精细解析。</p>
+                    </div>
+                  </div>
+
+                  <div class="quiz-footer">
+                    <button id="btn-save-wrong" class="glow-btn-outline" disabled><i class="fa-regular fa-bookmark"></i> 记入错题本</button>
+                    <button id="btn-next-question" class="glow-btn"><span>下一题</span> <i class="fa-solid fa-arrow-right"></i></button>
+                  </div>
+                </div>
+
+                <div id="wrong-questions-drawer" class="wrong-questions-drawer hidden">
+                  <div class="drawer-header">
+                    <h4>错题记录本</h4>
+                    <button id="btn-close-wrong" class="close-btn">&times;</button>
+                  </div>
+                  <div class="drawer-body">
+                    <div class="empty-state" id="wrong-empty">
+                      <i class="fa-solid fa-thumbs-up"></i>
+                      <p>太棒了，目前没有错题记录！</p>
+                    </div>
+                    <ul id="wrong-questions-list" class="records-list"></ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: 📊 学习看板 (Analytics Dashboard Hub) -->
+      <section id="section-dashboard" class="main-section">
+        <div class="dashboard-grid">
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-icon" style="background: rgba(124, 58, 237, 0.1); color: var(--accent-primary);"><i class="fa-solid fa-language"></i></div>
+              <div class="stat-info">
+                <span class="stat-title">累计翻译次数</span>
+                <span class="stat-number" id="stat-trans-total">0</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fa-solid fa-circle-check"></i></div>
+              <div class="stat-info">
+                <span class="stat-title">已熟记生词数</span>
+                <span class="stat-number" id="stat-vocab-mastered">0</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--accent-secondary);"><i class="fa-solid fa-award"></i></div>
+              <div class="stat-info">
+                <span class="stat-title">CET刷题总量</span>
+                <span class="stat-number" id="stat-cet-questions">0</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="heatmap-card">
+            <div class="heatmap-header">
+              <h5><i class="fa-solid fa-calendar-check" style="color: var(--accent-primary);"></i> 365 日学习状态热力图</h5>
+              <div class="streak-badge"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> 连续打卡: <strong id="streak-days-count">0</strong> 天</div>
+            </div>
+            <div class="heatmap-grid-container" id="heatmap-grid-container"></div>
+            <div class="heatmap-footer">
+              <span class="heatmap-legend-label">Less</span>
+              <div class="heatmap-legend">
+                <span class="heatmap-cell lvl-0"></span>
+                <span class="heatmap-cell lvl-1"></span>
+                <span class="heatmap-cell lvl-2"></span>
+                <span class="heatmap-cell lvl-3"></span>
+                <span class="heatmap-cell lvl-4"></span>
+              </div>
+              <span class="heatmap-legend-label">More</span>
+            </div>
+          </div>
+
+          <div class="charts-row">
+            <div class="chart-card">
+              <div class="chart-header">
+                <h5><i class="fa-solid fa-chart-line"></i> 7日翻译字数趋势</h5>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-trans-trend"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <h5><i class="fa-solid fa-chart-pie"></i> 生词掌握状态分布</h5>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-vocab-dist"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <h5><i class="fa-solid fa-chart-bar"></i> 口语评测表现历史</h5>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart-oral-scores"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <p>&copy; 2026 AuraTranslate. Designed with <i class="fa-solid fa-heart pulse"></i> for premium experience.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Pronunciation Practice Modal -->
+  <div id="pronunciation-practice-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4><i class="fa-solid fa-microphone-lines"></i> AI 口语发音评测</h4>
+        <button class="close-btn" id="btn-close-practice">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="practice-target-box">
+          <span class="target-label">评测句子 / 单词：</span>
+          <p id="target-practice-text" class="target-text">Loading...</p>
+        </div>
+        <div class="mic-stage">
+          <button id="btn-practice-mic" class="big-mic-btn" title="开始说话录音">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <span class="mic-hint">点击麦克风，大声读出上方英文</span>
+        </div>
+        <div id="practice-result-container" class="practice-result hidden">
+          <div class="score-circle">
+            <span id="practice-score-num">95</span>
+            <span class="score-unit">分</span>
+          </div>
+          <div class="result-detail">
+            <p id="practice-feedback-text">发音非常地道标准！发音清晰完整。</p>
+            <p class="transcript-text">识别内容：<span id="practice-transcript">...</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- API Key Modal -->
@@ -704,6 +668,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Core Script -->
-  <script src="app.js?v=8.0"></script>
+  <script src="app.js?v=9.0"></script>
 </body>
 </html>
