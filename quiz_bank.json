@@ -1,0 +1,82 @@
+{
+  "cet4": {
+    "vocab": [
+      {
+        "id": "c4_v1",
+        "question": "The manager decided to _____ the new policy starting from next Monday.",
+        "options": ["A. implement", "B. hesitate", "C. abandon", "D. contradict"],
+        "answer": 0,
+        "explanation": "正确答案为 A。implement 意为'实施，执行'。句意：经理决定从下周一开始实施新政策。"
+      },
+      {
+        "id": "c4_v2",
+        "question": "Her persistent efforts eventually brought her great _____ in her academic research.",
+        "options": ["A. frustration", "B. achievement", "C. obstacle", "D. reluctance"],
+        "answer": 1,
+        "explanation": "正确答案为 B。achievement 意为'成就，成绩'。句意：她坚持不懈的努力最终在学术研究中为她带来了巨大的成就。"
+      },
+      {
+        "id": "c4_v3",
+        "question": "The technology industry is experiencing _____ growth in recent years due to AI innovations.",
+        "options": ["A. rapid", "B. severe", "C. vague", "D. primitive"],
+        "answer": 0,
+        "explanation": "正确答案为 A。rapid 意为'快速的'。句意：由于AI创新，科技行业近年来正经历快速增长。"
+      },
+      {
+        "id": "c4_v4",
+        "question": "Please ensure all confidential files are stored in a _____ location.",
+        "options": ["A. vulnerable", "B. secure", "C. transparent", "D. temporary"],
+        "answer": 1,
+        "explanation": "正确答案为 B。secure 意为'安全的'。句意：请确保所有保密文件存储在安全的位置。"
+      }
+    ],
+    "reading": [
+      {
+        "id": "c4_r1",
+        "passage": "Artificial intelligence is reshaping modern education by providing personalized learning experiences. Adaptive learning platforms analyze student performance data in real time to adjust the difficulty of materials and recommend tailored practice problems. Research indicates that students using AI-driven tutoring systems demonstrate higher engagement and improved retention rates compared to traditional passive learning methods.",
+        "question": "How do adaptive learning platforms assist students according to the passage?",
+        "options": [
+          "A. By eliminating the need for teachers in classrooms.",
+          "B. By adjusting material difficulty based on real-time data.",
+          "C. By enforcing strict daily study schedules.",
+          "D. By replacing standard textbooks with video games."
+        ],
+        "answer": 1,
+        "explanation": "正确答案为 B。根据文章第二句'Adaptive learning platforms analyze student performance data in real time to adjust the difficulty of materials'可知，平台通过实时调整难度辅助学生。"
+      }
+    ]
+  },
+  "cet6": {
+    "vocab": [
+      {
+        "id": "c6_v1",
+        "question": "The government launched a series of initiatives to _____ economic recovery after the pandemic.",
+        "options": ["A. impede", "B. stimulate", "C. jeopardize", "D. deteriorate"],
+        "answer": 1,
+        "explanation": "正确答案为 B。stimulate 意为'刺激，促进'。句意：政府出台了一系列举措来促进疫情后的经济复苏。"
+      },
+      {
+        "id": "c6_v2",
+        "question": "Her argument was backed by _____ empirical evidence gathered over a decade.",
+        "options": ["A. substantial", "B. superficial", "C. dubious", "D. negligible"],
+        "answer": 0,
+        "explanation": "正确答案为 A。substantial 意为'大量的，充实的'。句意：她的论点得到了长达十年来收集的大量实证数据的支持。"
+      }
+    ],
+    "reading": [
+      {
+        "id": "c6_r1",
+        "passage": "The rapid deployment of automated systems across industries has raised profound questions regarding the future of workforce stability. While automation enhances operational efficiency and reduces human error, it simultaneously threatens middle-skill job security. Economists advocate for proactive policy measures, emphasizing continuous skill upgrading and lifelong learning ecosystems to mitigate structural unemployment.",
+        "question": "What do economists recommend to address potential workforce disruption?",
+        "options": [
+          "A. Banning automation technologies across manufacturing sectors.",
+          "B. Promoting lifelong learning and continuous skill upgrading.",
+          "C. Reducing corporate taxes to increase hiring incentives.",
+          "D. Encouraging workers to retire early."
+        ],
+        "answer": 1,
+        "explanation": "正确答案为 B。根据尾句'Economists advocate for proactive policy measures, emphasizing continuous skill upgrading and lifelong learning ecosystems'可知，经济学家建议推动终身学习与技能升级。"
+      }
+    ]
+  }
+}

@@ -473,8 +473,11 @@
                   <div class="quiz-tabs">
                     <button class="quiz-tab-btn active" data-quiz-type="vocab">词汇专项</button>
                     <button class="quiz-tab-btn" data-quiz-type="reading">仔细阅读</button>
+                    <button id="btn-ai-generate-quiz" class="text-link-btn font-bold" style="color: var(--accent-primary);" title="基于生词本生成出题"><i class="fa-solid fa-robot"></i> 生词本出题</button>
+                    <button id="btn-import-quiz-bank" class="text-link-btn font-bold" title="导入自定义 JSON 题库"><i class="fa-solid fa-file-import"></i> 导入题库</button>
                     <button id="btn-toggle-wrong-book" class="text-link-btn font-bold"><i class="fa-solid fa-book-bookmark"></i> 错题本 (<span id="wrong-count">0</span>)</button>
                   </div>
+                  <input type="file" id="quiz-bank-file-input" accept=".json" style="display:none;">
 
                   <div id="quiz-arena">
                     <!-- Dynamic Question Area -->

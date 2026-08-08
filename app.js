@@ -76,6 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const heatmapGridContainer = document.getElementById('heatmap-grid-container');
   const streakDaysCount = document.getElementById('streak-days-count');
+
+  // Quiz Bank DOM elements
+  const btnAiGenerateQuiz = document.getElementById('btn-ai-generate-quiz');
+  const btnImportQuizBank = document.getElementById('btn-import-quiz-bank');
+  const quizBankFileInput = document.getElementById('quiz-bank-file-input');
   
   const srcLangSelect = document.getElementById('src-lang');
   const tgtLangSelect = document.getElementById('tgt-lang');
@@ -235,7 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Phase 4 State
     engine: localStorage.getItem('aura_engine') || 'default',
-    customApiKey: localStorage.getItem('aura_custom_api_key') || ''
+    customApiKey: localStorage.getItem('aura_custom_api_key') || '',
+    customQuizBank: JSON.parse(localStorage.getItem('aura_custom_quiz_bank')) || []
   };
 
   // Defensive array checks to prevent type errors on null localStorage items
@@ -757,6 +763,15 @@ document.addEventListener('DOMContentLoaded', () => {
         keyModal.classList.add('hidden');
         showToast(state.customApiKey ? 'API Key 已安全保存！' : 'API Key 已清空', 'success');
       });
+    }
+
+    // Quiz Bank AI Generator & Custom Import
+    if (btnAiGenerateQuiz) {
+      btnAiGenerateQuiz.addEventListener('click', generateAiVocabQuiz);
+    }
+    if (btnImportQuizBank && quizBankFileInput) {
+      btnImportQuizBank.addEventListener('click', () => quizBankFileInput.click());
+      quizBankFileInput.addEventListener('change', handleImportQuizBankFile);
     }
 
     // Grammar Analysis trigger
@@ -2753,6 +2768,100 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     streakDaysCount.textContent = currentStreak;
+  }
+
+  // --- Quiz Bank Extensions: AI Quiz Generator & External Import ---
+  function loadExternalQuizBank() {
+    // 1. Fetch quiz_bank.json asynchronously
+    fetch('quiz_bank.json')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) {
+          if (data.cet4 && data.cet4.vocab) cetQuizzesDatabase.cet4.vocab.push(...data.cet4.vocab);
+          if (data.cet4 && data.cet4.reading) cetQuizzesDatabase.cet4.reading.push(...data.cet4.reading);
+          if (data.cet6 && data.cet6.vocab) cetQuizzesDatabase.cet6.vocab.push(...data.cet6.vocab);
+          if (data.cet6 && data.cet6.reading) cetQuizzesDatabase.cet6.reading.push(...data.cet6.reading);
+        }
+      })
+      .catch(e => console.log('quiz_bank.json load skipped:', e));
+
+    // 2. Merge custom imported quiz bank
+    if (state.customQuizBank && state.customQuizBank.length > 0) {
+      cetQuizzesDatabase.cet4.vocab.unshift(...state.customQuizBank);
+    }
+  }
+
+  function generateAiVocabQuiz() {
+    if (state.vocabulary.length === 0) {
+      showToast('生词本为空！请先在翻译或阅读时加入一些生词再使用 AI 出题！', 'warning');
+      return;
+    }
+
+    showToast('正在根据您的生词本智能出题...', 'info');
+    
+    // Pick up to 5 random words from vocabulary
+    const sampled = [...state.vocabulary].sort(() => 0.5 - Math.random()).slice(0, 5);
+    const generated = [];
+
+    sampled.forEach((v, idx) => {
+      // Build 4 option choices
+      const distractors = ['A. 快速的；急剧的', 'B. 简单的；易懂的', 'C. 复杂的；难懂的', 'D. 重要的；显著的'];
+      const correctText = `中文释义：${v.translation}`;
+      
+      const options = [
+        correctText,
+        distractors[0],
+        distractors[1],
+        distractors[2]
+      ].sort(() => 0.5 - Math.random());
+
+      const correctIndex = options.indexOf(correctText);
+
+      generated.push({
+        id: 'ai_q_' + Date.now() + '_' + idx,
+        question: `请选择生词 【 ${v.word} 】 (${v.pron || ''}) 的正确中文释义：`,
+        options: options.map((opt, i) => `${String.fromCharCode(65 + i)}. ${opt.replace(/^中文释义：/, '')}`),
+        answer: correctIndex,
+        explanation: `生词【${v.word}】保存在您的生词本中。正确释义为：${v.translation}。`
+      });
+    });
+
+    // Unshift into active quiz bank and reload
+    cetQuizzesDatabase.cet4.vocab.unshift(...generated);
+    state.activeQuizType = 'vocab';
+    state.activeQuizIndex = 0;
+    loadQuizQuestion();
+    showToast(`已成功为您的生词本生成 ${generated.length} 道针对性模拟题！`, 'success');
+  }
+
+  function handleImportQuizBankFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const json = JSON.parse(evt.target.result);
+        const list = Array.isArray(json) ? json : (json.vocab || json.questions || []);
+        
+        if (list.length === 0) {
+          showToast('导入文件格式不符或数据为空！需包含 question, options, answer 字段。', 'error');
+          return;
+        }
+
+        state.customQuizBank.unshift(...list);
+        localStorage.setItem('aura_custom_quiz_bank', JSON.stringify(state.customQuizBank));
+        
+        cetQuizzesDatabase.cet4.vocab.unshift(...list);
+        state.activeQuizIndex = 0;
+        loadQuizQuestion();
+        showToast(`成功导入 ${list.length} 道自定义题目到题库！`, 'success');
+      } catch(err) {
+        console.error(err);
+        showToast('读取 JSON 题库文件失败，请确保格式正确！', 'error');
+      }
+    };
+    reader.readAsText(file, 'utf-8');
   }
 
   // --- Run Init ---
