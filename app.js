@@ -994,11 +994,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (btnVoiceChatMic && recognition) {
       if (btnVoiceChatMic) btnVoiceChatMic.addEventListener('click', () => {
-        showToast('请开口说话语音对话...', 'info');
-        recognition.start();
+        if (state.isRecording) {
+          try { recognition.stop(); } catch (e) {}
+          state.isRecording = false;
+          showToast('已停止麦克风录音', 'info');
+          return;
+        }
+        showToast('正在聆听，请开口说话...', 'info');
+        try {
+          recognition.start();
+        } catch (err) {
+          console.warn("Speech recognition already running:", err);
+        }
         recognition.onresult = (e) => {
           const res = e.results[0][0].transcript;
-          if (res) {
+          if (res && inputVoiceChatText) {
             inputVoiceChatText.value = res;
             sendVoiceChatMessage();
           }
