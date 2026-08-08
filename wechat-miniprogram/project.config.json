@@ -1,0 +1,14 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "aura-translate-miniprogram",
+  "description": "AuraTranslate 极光翻译 - 微信小程序项目包",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  },
+  "compileType": "miniprogram"
+}
