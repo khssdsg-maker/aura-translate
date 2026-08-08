@@ -254,10 +254,10 @@
           <div id="academy-panel" class="tab-panel">
             <!-- Academy Sub navigation bar -->
             <div class="academy-nav">
-              <button id="subtab-word-learning" class="subtab-btn" data-subtab="word-learning">
+              <button id="subtab-word-learning" class="subtab-btn active" data-subtab="word-learning">
                 <i class="fa-solid fa-graduation-cap"></i> 单词学习
               </button>
-              <button id="subtab-vocab" class="subtab-btn active" data-subtab="vocab">
+              <button id="subtab-vocab" class="subtab-btn" data-subtab="vocab">
                 <i class="fa-solid fa-book"></i> 生词本
               </button>
               <button id="subtab-reader" class="subtab-btn" data-subtab="reader">
@@ -278,7 +278,7 @@
             <div class="academy-sub-content">
               
               <!-- 0. Word Learning Course Panel -->
-              <div id="academy-word-learning-view" class="academy-sub-panel">
+              <div id="academy-word-learning-view" class="academy-sub-panel active">
                 <div class="word-course-container">
                   <!-- Header Controls: Book selector & Goal -->
                   <div class="course-header-controls" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--card-border); padding: 0.85rem 1.15rem; border-radius: 16px; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
@@ -343,13 +343,14 @@
               </div>
 
               <!-- 1. Vocabulary & Flashcards Panel -->
-              <div id="academy-vocab-view" class="academy-sub-panel active">
+              <div id="academy-vocab-view" class="academy-sub-panel">
                 <div class="vocab-controls">
                   <span class="vocab-count">生词总数: <span id="vocab-total-count">0</span></span>
                   <span class="vocab-review-info hidden" id="vocab-review-info" style="font-size: 0.85rem; color: var(--text-muted); font-weight:600;">
                     今日待复习: <strong id="vocab-review-count" style="color: #ef4444; font-weight:700;">0</strong>
                   </span>
                   <div class="vocab-layout-toggles">
+                    <button id="btn-load-full-vocab" class="mini-btn" title="载入四六级全量词库" style="margin-right: 0.5rem; color: var(--accent-primary);"><i class="fa-solid fa-cloud-arrow-down"></i> 载入四六级全量词库</button>
                     <button id="btn-export-vocab" class="mini-btn" title="导出生词本 (CSV格式)" style="margin-right: 0.5rem;"><i class="fa-solid fa-file-export"></i> 导出</button>
                     <button id="btn-toggle-vocab-list" class="mini-btn active" title="列表视图"><i class="fa-solid fa-list"></i></button>
                     <button id="btn-toggle-vocab-card" class="mini-btn" title="卡片背诵"><i class="fa-solid fa-address-card"></i></button>
@@ -703,6 +704,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Core Script -->
-  <script src="app.js?v=5.0"></script>
+  <script src="app.js?v=6.0"></script>
 </body>
 </html>
