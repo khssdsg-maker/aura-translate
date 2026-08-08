@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { console.error("Sidebar nav update error:", e); }
 
     try {
-      // Update main section views active state
+      // Update main section views active state with explicit inline display control
       const sectionMap = {
         'translation': 'section-translation',
         'words': 'section-words',
@@ -568,13 +568,17 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       document.querySelectorAll('.main-section').forEach(sec => {
-        if (sec) sec.classList.remove('active');
+        if (sec) {
+          sec.classList.remove('active');
+          sec.style.setProperty('display', 'none', 'important');
+        }
       });
 
       const targetSecId = sectionMap[tabName] || 'section-translation';
       const targetSec = document.getElementById(targetSecId);
       if (targetSec) {
         targetSec.classList.add('active');
+        targetSec.style.setProperty('display', 'block', 'important');
       }
     } catch (e) { console.error("Main section switch error:", e); }
 
@@ -595,9 +599,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupEventListeners() {
     // Bind Sidebar Nav Buttons
     document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
-      if (btn) btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
+      if (btn) btn.addEventListener('click', (e) => {
+        const targetBtn = e.target.closest('.sidebar-nav-btn') || btn;
+        const tab = targetBtn.dataset.tab;
         if (tab) switchMainTab(tab);
+      });
+    });
+
+    document.querySelectorAll('.subtab-btn').forEach(btn => {
+      if (btn) btn.addEventListener('click', (e) => {
+        const targetBtn = e.target.closest('.subtab-btn') || btn;
+        const subtab = targetBtn.dataset.subtab;
+        if (subtab) switchSubtab(subtab);
       });
     });
     if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
